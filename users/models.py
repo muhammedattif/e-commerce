@@ -19,13 +19,13 @@ class MyAccountManager(BaseUserManager):
             raise VlaueError('User must have a username')
 
         is_active = True
-        if is_provider:
-            is_avtive = False
+        # if is_provider:
+        #     is_active = False
 
         user = self.model(
                         email=self.normalize_email(email),
                         username=username,
-                        is_avtive=is_avtive,
+                        is_active=is_active,
                         is_staff=is_staff,
                         is_superuser=is_superuser,
                         is_provider=is_provider
