@@ -35,7 +35,15 @@ class FeatureAttribute(models.Model):
     feature = models.ForeignKey(Feature, on_delete=models.CASCADE, related_name='attributes')
     name = models.CharField(max_length=100)
 
+    def __str__(self):
+        return f'{self.feature.product}-{self.feature.name}-{self.name}'
 
+
+class FeatureMap(models.Model):
+    attribute1 = models.ForeignKey(FeatureAttribute, on_delete=models.CASCADE, related_name='attribute1')
+    attribute2 = models.ForeignKey(FeatureAttribute, on_delete=models.CASCADE, related_name='attribute2')
+    quantity = models.PositiveIntegerField()
+    price = models.FloatField()
 
 # Product Images Model
 class ProductImage(models.Model):
