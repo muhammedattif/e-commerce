@@ -60,9 +60,11 @@ INSTALLED_APPS = [
     #PLUGINS
     'ckeditor',
     'ckeditor_uploader',
+    'drf_yasg',
     #APPS
     'users',
-    'products'
+    'products',
+    'payment'
 ]
 
 SITE_ID = 1

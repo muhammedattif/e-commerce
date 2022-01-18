@@ -47,3 +47,29 @@ class ProductDetail(APIView):
 
         serializer = ProductSerializer(product, many=False, context={'request': request})
         return Response(serializer.data)
+
+class ReviewsListCreateView(APIView):
+
+    def get(self, request, id):
+        product, found, error = utils.get_product(id)
+        if not found:
+            return Response(error, status=status.HTTP_404_NOT_FOUND)
+
+        reviews = product.reviews.all()
+        serializer = ReviewSerializer(reviews, many=True, context={'request': request})
+        return Response(serializer.data)
+
+    def post(self, request, id):
+
+        product, found, error = utils.get_product(id)
+        if not found:
+            return Response(error, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = ReviewCreateSerializer(data=request.data, context={'user': request.user, 'product': product})
+
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        review = serializer.save()
+        serializer = ReviewSerializer(review)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

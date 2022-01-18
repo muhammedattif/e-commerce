@@ -67,7 +67,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
-
+    
     # resize profile image before saving
     def save(self, created=None, *args, **kwargs):
         super().save(*args, **kwargs)
