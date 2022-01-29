@@ -1,4 +1,5 @@
 from django.db import models
+from djmoney.models.fields import MoneyField
 from django.conf import settings
 from products.models import Product
 
@@ -12,3 +13,14 @@ class CartItem(models.Model):
 
     def __str__(self):
         return f'{self.user.username}-{self.product}'
+
+
+class Order(models.Model):
+    user = models.ForeignKey(UserModel, on_delete=models.CASCADE)
+    items = models.ManyToManyField(CartItem)
+    total = MoneyField(max_digits=14, decimal_places=4)
+    sub_total = MoneyField(max_digits=14, decimal_places=4)
+    discount = MoneyField(max_digits=14, decimal_places=4, default=0)
+
+    def __str__(self):
+          return self.user.username

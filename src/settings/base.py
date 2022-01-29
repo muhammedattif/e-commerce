@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'ckeditor_uploader',
     'drf_yasg',
     'django_filters',
+    'djmoney',
     #APPS
     'users',
     'vendor',

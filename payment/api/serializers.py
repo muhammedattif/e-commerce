@@ -10,7 +10,7 @@ UserModel = settings.AUTH_USER_MODEL
 
 from users.api.serializers import UserBasicInfoSerializer
 from products.api.serializers import ProductsSerializer
-from payment.models import CartItem
+from payment.models import CartItem, Order
 
 class CartItemSerializer(serializers.ModelSerializer):
     product = ProductsSerializer(many=False, read_only=True)
@@ -30,3 +30,9 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
         validated_data['user'] = user
         cart_item = CartItem.objects.create(**validated_data)
         return cart_item
+
+class OrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Order
+        fields = ('id', 'total', 'total_currency', 'sub_total', 'sub_total_currency', 'discount', 'discount_currency')
+        depth = 2

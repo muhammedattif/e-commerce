@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import CartItem
+from .models import CartItem, Order
 
 
 class CartItemConfig(admin.ModelAdmin):
@@ -9,3 +9,4 @@ class CartItemConfig(admin.ModelAdmin):
     list_display = ('user', 'product')
 
 admin.site.register(CartItem, CartItemConfig)
+admin.site.register(Order)

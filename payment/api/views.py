@@ -4,11 +4,12 @@ from rest_framework.pagination import PageNumberPagination
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.views import APIView
-
+from django.db.models import Sum
 import src.utils as general_utils
-from payment.models import CartItem
+from payment.models import CartItem, Order
 import payment.utils as utils
 from .serializers import *
+from djmoney.money import Money
 
 class BaseListCreateCartItemView(APIView):
 
@@ -25,3 +26,16 @@ class BaseListCreateCartItemView(APIView):
         cart_item = serializer.save()
         serializer = CartItemSerializer(cart_item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+class CheckoutView(APIView):
+
+    def get(self, request):
+
+        cart_items = CartItem.objects.select_related('user','product').filter(user=request.user)
+        cart_items_sub_total = cart_items.aggregate(sum=Sum('product__price'))['sum']
+        cart_items_discounts = cart_items.aggregate(sum=Sum('product__discount'))['sum']
+        cart_items_total = cart_items_sub_total - cart_items_discounts
+        order = Order.objects.create(user=request.user, total=Money(cart_items_total, 'SAR'), sub_total=Money(cart_items_sub_total, 'SAR'), discount=Money(cart_items_discounts, 'SAR'))
+        order.items.set(cart_items)
+        serializer = OrderSerializer(order, many=False)
+        return Response(serializer.data)
