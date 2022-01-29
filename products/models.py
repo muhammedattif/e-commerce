@@ -52,6 +52,9 @@ class Product(models.Model):
 
         return round(total_score/total_reviews, 1)
 
+    def get_relevant_products(self):
+        return self.category.products.all().order_by('-creation')[:5]
+
 class Feature(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')
     name = models.CharField(max_length=100)

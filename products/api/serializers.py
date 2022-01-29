@@ -30,14 +30,27 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ProductSerializer(serializers.ModelSerializer):
     rating = serializers.FloatField(source='get_rating')
+    class Meta:
+        model = Product
+        fields = ('id', 'name', 'description', 'price', 'discount', 'rating', 'creation')
+
+class SingleProductSerializer(serializers.ModelSerializer):
+    rating = serializers.FloatField(source='get_rating')
     vendor = UserBasicInfoSerializer(many=False, read_only=True)
     features = FeatureSerializer(many=True, read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     category = CategorySerializer(many=False, read_only=True)
     brand = BrandSerializer(many=False, read_only=True)
+    relevant_products = serializers.SerializerMethodField('get_relevant_products')
+
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'quantity', 'rating', 'features', 'category', 'brand', 'images', 'vendor', 'creation')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'quantity', 'rating', 'features', 'category', 'brand', 'images', 'vendor', 'creation', 'relevant_products')
+
+
+    def get_relevant_products(self, product):
+        products = ProductSerializer(product.get_relevant_products(), many=True)
+        return products.data
 
 class ProductCreateSerializer(serializers.ModelSerializer):
     class Meta:

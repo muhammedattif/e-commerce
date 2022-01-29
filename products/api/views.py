@@ -13,10 +13,29 @@ from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.db import transaction
 import src.utils as general_utils
-from products.models import Product, Feature, FeatureAttribute
+from products.models import Product, ProductImage, Feature, FeatureAttribute
 import products.utils as utils
 from .serializers import *
 from src.custom_permissions import IsPostOrIsAuthenticated
+import json
+from rest_framework.generics import ListAPIView
+from django.db.models import Q
+from functools import reduce
+import operator
+from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
+from rest_framework import filters
+
+
+
+class ProductFilter(ListAPIView):
+    permission_classes = ()
+    queryset = Product.objects.select_related('category', 'brand', 'vendor').prefetch_related('features__attributes', 'category__childs', 'images', 'reviews').all()
+    serializer_class = ProductSerializer
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['name', 'description']
+    filterset_fields = ['category__name', 'brand__name', 'price']
+    ordering_fields = ['price', 'creation']
+
 
 class BaseListCreateProductView(APIView, PageNumberPagination):
 
@@ -33,22 +52,33 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
         if not request.user.is_authenticated or not request.user.is_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
-        vendor = request.user
-        features = request.data.pop('features')
-        product = Product.objects.create(vendor=vendor, **request.data)
+        product_images = request.data.getlist('images')
+        body = json.loads(request.data['body'])
 
+        vendor = request.user
+        features = body.pop('features')
+        product = Product.objects.create(vendor=vendor, **body)
+
+        images_obj = []
         features_obj = []
         attributes_obj = []
+
+        for image in product_images:
+            product_image_instance = ProductImage(product=product, image=image)
+            images_obj.append(product_image_instance)
+
         for feature in features:
             attributes = feature.pop('attributes')
-            feature = Feature(product=product, **feature)
+            feature_instance = Feature(product=product, **feature)
 
             for attribute in attributes:
-                attribute = FeatureAttribute(feature=feature, **attribute)
-                attributes_obj.append(attribute)
+                attribute_instance = FeatureAttribute(feature=feature_instance, **attribute)
+                attributes_obj.append(attribute_instance)
 
-            features_obj.append(feature)
+            features_obj.append(feature_instance)
 
+        print(1)
+        ProductImage.objects.bulk_create(images_obj)
         Feature.objects.bulk_create(features_obj)
         FeatureAttribute.objects.bulk_create(attributes_obj)
         serializer = ProductSerializer(product)
@@ -58,11 +88,11 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
 class ProductDetail(APIView):
 
     def get(self, request, id):
-        product, found, error = utils.get_product(id, select_related=['category', 'vendor'], prefetch_related=['features__attributes', 'images'])
+        product, found, error = utils.get_product(id, select_related=['category', 'vendor'], prefetch_related=['features__attributes', 'images', 'reviews'])
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = ProductSerializer(product, many=False, context={'request': request})
+        serializer = SingleProductSerializer(product, many=False, context={'request': request})
         return Response(serializer.data)
 
 
