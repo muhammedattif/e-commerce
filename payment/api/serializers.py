@@ -21,13 +21,12 @@ class CartItemSerializer(serializers.ModelSerializer):
 
 class CartItemCreateSerializer(serializers.ModelSerializer):
     user = UserBasicInfoSerializer(many=False, read_only=True)
-    product = ProductSerializer(many=False, read_only=True)
     class Meta:
         model = CartItem
         fields = '__all__'
 
     def create(self, validated_data):
         user = self.context.get('request', None).user
-        validated_data['provider'] = user
-        product = Product.objects.create(**validated_data)
-        return product
+        validated_data['user'] = user
+        cart_item = CartItem.objects.create(**validated_data)
+        return cart_item

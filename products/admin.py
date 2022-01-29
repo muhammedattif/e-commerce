@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, ProductImage, Feature, FeatureAttribute, Review, FeatureMap
+from .models import Product, ProductImage, Feature, FeatureAttribute, Review
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
 class FeatureAttributeInline(NestedStackedInline):
@@ -27,13 +27,11 @@ class ReviewConfig(admin.ModelAdmin):
 class ProductConfig(NestedModelAdmin):
     model = Review
 
-    list_filter = ('provider', 'name', 'description', 'price', 'quantity', 'discount', 'creation', 'data')
-    list_display = ('provider', 'name', 'description', 'price', 'quantity', 'discount', 'creation', 'data')
+    list_filter = ('provider', 'name', 'description', 'price', 'quantity', 'discount', 'creation')
+    list_display = ('provider', 'name', 'description', 'price', 'quantity', 'discount', 'creation')
 
-    inlines = [FeatureInline]
 
 admin.site.register(Review, ReviewConfig)
-admin.site.register(FeatureMap)
 admin.site.register(Product, ProductConfig)
 admin.site.register(Feature)
 admin.site.register(FeatureAttribute)

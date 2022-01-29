@@ -17,13 +17,16 @@ class Product(models.Model):
     discount = models.IntegerField()
     quantity = models.IntegerField(default=1)
     creation = models.DateTimeField(blank=True, auto_now_add=True)
-    data = JSONField(db_index=True)
+    # data = JSONField(db_index=True)
 
     def __str__(self):
         return self.name
 
     def get_rating(self):
         total_reviews = self.reviews.count()
+        if not total_reviews:
+            return 0
+
         reviews = self.reviews.all()
 
         _5_star_reviews = 0
@@ -59,18 +62,10 @@ class Feature(models.Model):
 
 class FeatureAttribute(models.Model):
     feature = models.ForeignKey(Feature, on_delete=models.CASCADE, related_name='attributes')
-    dependent = models.ForeignKey('self', on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
 
     def __str__(self):
         return f'{self.feature.product}-{self.feature.name}-{self.name}'
-
-
-class FeatureMap(models.Model):
-    attribute1 = models.ForeignKey(FeatureAttribute, on_delete=models.CASCADE, related_name='attribute1')
-    attribute2 = models.ForeignKey(FeatureAttribute, on_delete=models.CASCADE, related_name='attribute2')
-    quantity = models.PositiveIntegerField()
-    price = models.FloatField()
 
 # Product Images Model
 class ProductImage(models.Model):
@@ -83,11 +78,11 @@ class ProductImage(models.Model):
 class Review(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product ,on_delete=models.CASCADE, related_name="reviews")
-    body = models.TextField(max_length=3000 , blank=True)
-    rate = models.PositiveSmallIntegerField(default=0,
+    body = models.TextField(max_length=3000)
+    rate = models.PositiveSmallIntegerField(default=1,
         validators=[
         MaxValueValidator(5),
-        MinValueValidator(0)
+        MinValueValidator(1)
         ])
 
     likes= models.PositiveIntegerField(default=0)

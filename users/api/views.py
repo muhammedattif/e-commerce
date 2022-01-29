@@ -46,6 +46,8 @@ class SignIn(APIView):
 
 class SignUp(APIView):
 
+    permission_classes = ()
+    
     def post(self, request, format=True):
         serializer = SignUpSerializer(data=request.data)
         if serializer.is_valid():
