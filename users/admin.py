@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from users.models import User, Student, Teacher, ProviderProfile, CustomerProfile, Address
+from users.models import User, Student, Teacher, VendorProfile, CustomerProfile, Address
 
 class UserConfig(UserAdmin):
     model = User
@@ -12,7 +12,7 @@ class UserConfig(UserAdmin):
 
     fieldsets = (
         ("User Information", {'fields': ('email', 'username', 'first_name', 'last_name', 'avatar', 'location')}),
-        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_provider', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_vendor', 'is_superuser', 'groups', 'user_permissions')}),
     )
 
 class StudentConfig(admin.ModelAdmin):
@@ -32,7 +32,7 @@ class TeacherConfig(admin.ModelAdmin):
     list_filter = ('major', )
     list_display = ('user', 'major')
 
-class ProviderConfig(admin.ModelAdmin):
+class VendorConfig(admin.ModelAdmin):
     model = Teacher
 
     list_filter = ('user', )
@@ -49,6 +49,6 @@ class AddressConfig(admin.ModelAdmin):
 admin.site.register(User, UserConfig)
 admin.site.register(Student, StudentConfig)
 admin.site.register(Teacher, TeacherConfig)
-admin.site.register(ProviderProfile, ProviderConfig)
+admin.site.register(VendorProfile, VendorConfig)
 admin.site.register(CustomerProfile)
 admin.site.register(Address, AddressConfig)

@@ -30,12 +30,12 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
 
     @transaction.atomic
     def post(self, request, format=None):
-        if not request.user.is_authenticated or not request.user.is_provider:
-            return Response(general_utils.error('not_provider'), status=status.HTTP_403_FORBIDDEN)
+        if not request.user.is_authenticated or not request.user.is_vendor:
+            return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
-        provider = request.user
+        vendor = request.user
         features = request.data.pop('features')
-        product = Product.objects.create(provider=provider, **request.data)
+        product = Product.objects.create(vendor=vendor, **request.data)
 
         features_obj = []
         attributes_obj = []
@@ -58,7 +58,7 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
 class ProductDetail(APIView):
 
     def get(self, request, id):
-        product, found, error = utils.get_product(id)
+        product, found, error = utils.get_product(id, select_related=['category', 'vendor'], prefetch_related=['features__attributes', 'images'])
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
@@ -100,3 +100,16 @@ class ReviewsListCreateView(APIView):
         review = serializer.save()
         serializer = ReviewSerializer(review)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CheckReview(APIView):
+
+    def get(self, request, id):
+        response = {}
+        try:
+            review = Review.objects.filter(user=request.user, product_id=id).first()
+            response['reviewd'] = True
+        except Review.DoesNotExist:
+            response['reviewd'] = False
+
+        return Response(response)

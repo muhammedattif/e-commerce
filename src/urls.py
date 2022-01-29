@@ -58,6 +58,12 @@ urlpatterns = [
     path('payment/', include('payment.urls', 'payment')),
     # Products APIs
     path('api/payment/', include('payment.api.urls', 'payment_api')),
+
+
+    # Categories
+    path('categories/', include('categories.urls', 'categories')),
+    # Categories APIs
+    path('api/categories/', include('categories.api.urls', 'categories_api')),
 ]
 
 if settings.DEBUG:

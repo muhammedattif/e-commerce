@@ -20,14 +20,14 @@ class SignUpSerializer(serializers.ModelSerializer):
 
     @transaction.atomic
     def save(self):
-        is_provider = False
-        if 'is_provider' in self.validated_data and self.validated_data['is_provider']:
-            is_provider = True
+        is_vendor = False
+        if 'is_vendor' in self.validated_data and self.validated_data['is_vendor']:
+            is_vendor = True
 
         user = User(
             email=self.validated_data['email'],
             username=self.validated_data['username'],
-            is_provider=is_provider
+            is_vendor=is_vendor
         )
 
         password = self.validated_data['password']

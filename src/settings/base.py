@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [env('ALLOWED_HOST')]
 # Application definition
 
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -64,7 +65,8 @@ INSTALLED_APPS = [
     #APPS
     'users',
     'products',
-    'payment'
+    'payment',
+    'categories'
 ]
 
 SITE_ID = 1

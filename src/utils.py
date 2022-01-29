@@ -14,7 +14,7 @@ def success(success_key):
     }
 
 error_messages = {
-    'not_provider': 'You must be a provider to add Products.',
+    'not_vendor': 'You must be a Vendor to add Products.',
     'product_not_found': 'This Product is not available.',
     'access_denied': 'You don\'t have access to this resourse!, enroll this course to see its content.',
     'required_fields': 'Some fields are required.',

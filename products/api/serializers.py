@@ -9,8 +9,8 @@ from django.db import transaction
 
 from users.api.serializers import UserBasicInfoSerializer
 from users.models import User
-from products.models import Product, Review, Feature, FeatureAttribute
-
+from products.models import Product, ProductImage, Review, Feature, FeatureAttribute
+from categories.api.serializers import BrandSerializer, CategorySerializer
 
 class FeatureAttributeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -21,15 +21,23 @@ class FeatureSerializer(serializers.ModelSerializer):
     attributes = FeatureAttributeSerializer(many=True, read_only=True)
     class Meta:
         model = Feature
-        fields = '__all__'
+        fields = ('id', 'name', 'attributes')
+
+class ProductImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ProductImage
+        fields = ('image',)
 
 class ProductSerializer(serializers.ModelSerializer):
     rating = serializers.FloatField(source='get_rating')
-    provider = UserBasicInfoSerializer(many=False, read_only=True)
+    vendor = UserBasicInfoSerializer(many=False, read_only=True)
     features = FeatureSerializer(many=True, read_only=True)
+    images = ProductImageSerializer(many=True, read_only=True)
+    category = CategorySerializer(many=False, read_only=True)
+    brand = BrandSerializer(many=False, read_only=True)
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'quantity', 'rating', 'features', 'provider', 'creation')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'quantity', 'rating', 'features', 'category', 'brand', 'images', 'vendor', 'creation')
 
 class ProductCreateSerializer(serializers.ModelSerializer):
     class Meta:

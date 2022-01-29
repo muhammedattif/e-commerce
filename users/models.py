@@ -12,14 +12,14 @@ def get_image_filename(instance, filename):
 # this class is for overriding default users manager of django user model
 class MyAccountManager(BaseUserManager):
 
-    def create_user(self, email, username, password=None, is_staff=False, is_superuser=False, is_provider=False):
+    def create_user(self, email, username, password=None, is_staff=False, is_superuser=False, is_vendor=False):
         if not email:
             raise ValueError('User must have an email address')
         if not username:
             raise VlaueError('User must have a username')
 
         is_active = True
-        # if is_provider:
+        # if is_vendor:
         #     is_active = False
 
         user = self.model(
@@ -28,7 +28,7 @@ class MyAccountManager(BaseUserManager):
                         is_active=is_active,
                         is_staff=is_staff,
                         is_superuser=is_superuser,
-                        is_provider=is_provider
+                        is_vendor=is_vendor
         )
 
 
@@ -43,7 +43,7 @@ class MyAccountManager(BaseUserManager):
             password=password,
             username=username,
             is_staff = True,
-            is_provider = True,
+            is_vendor = True,
             is_superuser = True
         )
         user.save(using = self._db)
@@ -61,19 +61,19 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_login = models.DateTimeField(verbose_name="Last Login", auto_now=True)
     is_active = models.BooleanField('Active status', default=True)
     is_staff = models.BooleanField('Staff status', default=False)
-    is_provider = models.BooleanField('Provider status', default=False)
+    is_vendor = models.BooleanField('Vendor status', default=False)
 
     objects = MyAccountManager()
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
-    
+
     # resize profile image before saving
     def save(self, created=None, *args, **kwargs):
         super().save(*args, **kwargs)
 
 
-class ProviderProfile(models.Model):
+class VendorProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
 
     def __str__(self):
