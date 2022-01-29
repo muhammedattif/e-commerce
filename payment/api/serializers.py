@@ -9,11 +9,11 @@ from django.conf import settings
 UserModel = settings.AUTH_USER_MODEL
 
 from users.api.serializers import UserBasicInfoSerializer
-from products.api.serializers import ProductSerializer
+from products.api.serializers import ProductsSerializer
 from payment.models import CartItem
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductSerializer(many=False, read_only=True)
+    product = ProductsSerializer(many=False, read_only=True)
     class Meta:
         model = CartItem
         fields = '__all__'

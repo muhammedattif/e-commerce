@@ -30,7 +30,7 @@ from rest_framework import filters
 class ProductFilter(ListAPIView):
     permission_classes = ()
     queryset = Product.objects.select_related('category', 'brand', 'vendor').prefetch_related('features__attributes', 'category__childs', 'images', 'reviews').all()
-    serializer_class = ProductSerializer
+    serializer_class = ProductsSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name', 'description']
     filterset_fields = ['category__name', 'brand__name', 'price']
@@ -42,9 +42,9 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
     permission_classes=(IsPostOrIsAuthenticated,)
 
     def get(self, request, format=None):
-        products = Product.objects.all()
+        products = Product.objects.prefetch_related('reviews').all()
         products = self.paginate_queryset(products, request, view=self)
-        serializer = ProductSerializer(products, many=True, context={'request': request})
+        serializer = ProductsSerializer(products, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
 
     @transaction.atomic
@@ -77,24 +77,22 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
 
             features_obj.append(feature_instance)
 
-        print(1)
         ProductImage.objects.bulk_create(images_obj)
         Feature.objects.bulk_create(features_obj)
         FeatureAttribute.objects.bulk_create(attributes_obj)
-        serializer = ProductSerializer(product)
+        serializer = ProductsSerializer(product)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 class ProductDetail(APIView):
 
     def get(self, request, id):
-        product, found, error = utils.get_product(id, select_related=['category', 'vendor'], prefetch_related=['features__attributes', 'images', 'reviews'])
+        product, found, error = utils.get_product(id, select_related=['category', 'vendor'], prefetch_related=['features__attributes', 'images', 'reviews', 'category__products__reviews'])
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
         serializer = SingleProductSerializer(product, many=False, context={'request': request})
         return Response(serializer.data)
-
 
 
 class ReviewsListCreateView(APIView):

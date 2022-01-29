@@ -21,6 +21,9 @@ class Product(models.Model):
     creation = models.DateTimeField(blank=True, auto_now_add=True)
     # data = JSONField(db_index=True)
 
+    class Meta:
+        ordering = ('-creation',)
+
     def __str__(self):
         return self.name
 
@@ -53,7 +56,7 @@ class Product(models.Model):
         return round(total_score/total_reviews, 1)
 
     def get_relevant_products(self):
-        return self.category.products.all().order_by('-creation')[:5]
+        return self.category.products.all()[:5]
 
 class Feature(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')

@@ -49,6 +49,11 @@ urlpatterns = [
     # Users APIs
     path('api/users/', include('users.api.urls', 'users_api')),
 
+    # Vendor
+    path('vendor/', include('vendor.urls', 'vendor')),
+    # Vendor APIs
+    path('api/vendor/', include('vendor.api.urls', 'vendor_api')),
+
     # Products
     path('products/', include('products.urls', 'products')),
     # Products APIs
@@ -58,7 +63,6 @@ urlpatterns = [
     path('payment/', include('payment.urls', 'payment')),
     # Products APIs
     path('api/payment/', include('payment.api.urls', 'payment_api')),
-
 
     # Categories
     path('categories/', include('categories.urls', 'categories')),
