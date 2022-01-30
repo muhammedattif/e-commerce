@@ -1,12 +1,7 @@
 from django.contrib import admin
-from .models import CartItem, Order
+from .models import CartItem, Order, Cart
 
 
-class CartItemConfig(admin.ModelAdmin):
-    model = CartItem
-
-    list_filter = ('user', 'product')
-    list_display = ('user', 'product')
-
-admin.site.register(CartItem, CartItemConfig)
+admin.site.register(CartItem)
+admin.site.register(Cart)
 admin.site.register(Order)
