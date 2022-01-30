@@ -32,7 +32,11 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
         return cart_item
 
 class OrderSerializer(serializers.ModelSerializer):
+    discount_percentage = serializers.SerializerMethodField('get_discount_percentage')
     class Meta:
         model = Order
-        fields = ('id', 'total', 'total_currency', 'sub_total', 'sub_total_currency', 'discount', 'discount_currency')
-        depth = 2
+        fields = ('id', 'total', 'total_currency', 'sub_total', 'sub_total_currency', 'discount', 'discount_currency', 'discount_percentage' , 'address')
+        depth = 1
+
+    def get_discount_percentage(self, order):
+        return (order.discount/order.sub_total)*100

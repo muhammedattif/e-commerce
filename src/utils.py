@@ -21,7 +21,8 @@ error_messages = {
     'quiz_not_found': 'This content does not has any quizzes.',
     'question_not_found': 'This question does not exists.',
     'choice_not_found': 'The answer must be one of the choices.',
-    'page_access_denied': 'You don\'t have access to preview this page.'
+    'page_access_denied': 'You don\'t have access to preview this page.',
+    'invalid_params': "Invalid Parameters."
 }
 
 success_messages = {}

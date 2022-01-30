@@ -1,12 +1,20 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
 
+
+class Brand(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+          return self.name
+
+
 class Category(MPTTModel):
     """docstring for ParentCategory."""
 
     # add initial values to db when migrating
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     parent = TreeForeignKey(
         'self',
         blank=True,
@@ -16,7 +24,7 @@ class Category(MPTTModel):
     )
 
     class Meta:
-        unique_together = ('name', 'parent',)
+        unique_together = ('name', 'parent')
         verbose_name_plural = 'Categories'
 
     def __str__(self):
@@ -27,10 +35,3 @@ class Category(MPTTModel):
             k = k.parent
 
         return ' -> '.join(full_path[::-1])
-
-
-class Brand(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-          return self.name

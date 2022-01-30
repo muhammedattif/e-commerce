@@ -61,6 +61,7 @@ class Product(models.Model):
 class Feature(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')
     name = models.CharField(max_length=100)
+    type = models.CharField(max_length=100)
 
     class Meta:
         unique_together = ('product', 'name')

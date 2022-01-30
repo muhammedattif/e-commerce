@@ -18,3 +18,11 @@ class VendorProductReviewsList(ListAPIView):
     def get_queryset(self):
         queryset = Review.objects.select_related('user', 'product').filter(product__vendor=self.request.user)
         return queryset
+
+class VendorOrderList(ListAPIView):
+
+    serializer_class = VendorReviewsSerializer
+
+    def get_queryset(self):
+        queryset = Review.objects.select_related('user', 'product').filter(product__vendor=self.request.user)
+        return queryset

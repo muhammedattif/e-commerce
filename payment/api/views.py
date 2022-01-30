@@ -10,6 +10,7 @@ from payment.models import CartItem, Order
 import payment.utils as utils
 from .serializers import *
 from djmoney.money import Money
+from users.models import Address
 
 class BaseListCreateCartItemView(APIView):
 
@@ -29,13 +30,27 @@ class BaseListCreateCartItemView(APIView):
 
 class CheckoutView(APIView):
 
-    def get(self, request):
+    def post(self, request):
 
+        try:
+            address_id = request.data['address_id']
+            address = Address.objects.get(id=address_id, user=request.user)
+        except Exception as e:
+            error = general_utils.error('invalid_params')
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            
         cart_items = CartItem.objects.select_related('user','product').filter(user=request.user)
         cart_items_sub_total = cart_items.aggregate(sum=Sum('product__price'))['sum']
         cart_items_discounts = cart_items.aggregate(sum=Sum('product__discount'))['sum']
         cart_items_total = cart_items_sub_total - cart_items_discounts
-        order = Order.objects.create(user=request.user, total=Money(cart_items_total, 'SAR'), sub_total=Money(cart_items_sub_total, 'SAR'), discount=Money(cart_items_discounts, 'SAR'))
+        order = Order.objects.create(
+                user=request.user,
+                total=Money(cart_items_total, 'SAR'),
+                sub_total=Money(cart_items_sub_total, 'SAR'),
+                discount=Money(cart_items_discounts, 'SAR'),
+                address=address
+         )
+
         order.items.set(cart_items)
         serializer = OrderSerializer(order, many=False)
         return Response(serializer.data)

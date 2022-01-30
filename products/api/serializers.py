@@ -21,7 +21,7 @@ class FeatureSerializer(serializers.ModelSerializer):
     attributes = FeatureAttributeSerializer(many=True, read_only=True)
     class Meta:
         model = Feature
-        fields = ('id', 'name', 'attributes')
+        fields = ('id', 'name', 'type', 'attributes')
 
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -30,9 +30,13 @@ class ProductImageSerializer(serializers.ModelSerializer):
 
 class ProductsSerializer(serializers.ModelSerializer):
     rating = serializers.FloatField(source='get_rating')
+    discount_percentage = serializers.SerializerMethodField('get_discount_percentage')
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'quantity', 'rating', 'creation')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'quantity', 'rating', 'creation')
+
+    def get_discount_percentage(self, product):
+        return (product.discount/product.price)*100
 
 class SingleProductSerializer(serializers.ModelSerializer):
     rating = serializers.FloatField(source='get_rating')
@@ -42,15 +46,19 @@ class SingleProductSerializer(serializers.ModelSerializer):
     category = CategorySerializer(many=False, read_only=True)
     brand = BrandSerializer(many=False, read_only=True)
     relevant_products = serializers.SerializerMethodField('get_relevant_products')
+    discount_percentage = serializers.SerializerMethodField('get_discount_percentage')
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'quantity', 'rating', 'features', 'category', 'brand', 'images', 'vendor', 'creation', 'relevant_products')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'quantity', 'rating', 'features', 'category', 'brand', 'images', 'vendor', 'creation', 'relevant_products')
 
 
     def get_relevant_products(self, product):
         products = ProductsSerializer(product.get_relevant_products(), many=True)
         return products.data
+
+    def get_discount_percentage(self, product):
+        return (product.discount/product.price)*100
 
 class VendorProductsSerializer(serializers.ModelSerializer):
     features = FeatureSerializer(many=True, read_only=True)
