@@ -6,17 +6,18 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.db.models import Sum
 import src.utils as general_utils
-from payment.models import Cart, CartItem, Order
+from payment.models import Cart, CartItem, Order, OrderItem
 import payment.utils as utils
 from .serializers import *
 from djmoney.money import Money
 from users.models import Address
 from products.models import FeatureAttributesMap
+from django.db import transaction
 
 class BaseListCreateCartItemView(APIView):
 
     def get(self, request, format=None):
-        cart = Cart.objects.prefetch_related('items__product__reviews', 'items__attributes_map__attributes').get(user=request.user)
+        cart = Cart.objects.prefetch_related('items__product', 'items__attributes_map__attributes').get(user=request.user)
         serializer = CartSerializer(cart, many=False, context={'request': request})
         return Response(serializer.data)
 
@@ -42,29 +43,49 @@ class BaseListCreateCartItemView(APIView):
         serializer = CartItemSerializer(cart_item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
+
 class CheckoutView(APIView):
 
+    @transaction.atomic
     def post(self, request):
 
         try:
             address_id = request.data['address_id']
             address = Address.objects.get(id=address_id, user=request.user)
-        except Exception as e:
+        except KeyError:
             error = general_utils.error('invalid_params')
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
-        cart_items = CartItem.objects.select_related('user','product').filter(user=request.user)
-        cart_items_sub_total = cart_items.aggregate(sum=Sum('product__price'))['sum']
-        cart_items_discounts = cart_items.aggregate(sum=Sum('product__discount'))['sum']
-        cart_items_total = cart_items_sub_total - cart_items_discounts
+        cart = Cart.objects.prefetch_related('items__product', 'items__attributes_map__attributes').get(user=request.user)
+
+        # Get cart items
+        cart_items = cart.items.all()
+
+        if not cart_items:
+            error = general_utils.error('empty_cart')
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
         order = Order.objects.create(
                 user=request.user,
-                total=Money(cart_items_total, 'SAR'),
-                sub_total=Money(cart_items_sub_total, 'SAR'),
-                discount=Money(cart_items_discounts, 'SAR'),
+                total=cart.total,
+                sub_total=cart.sub_total,
+                discount=cart.discount,
                 address=address
          )
 
-        order.items.set(cart_items)
+        order_items_objs = []
+
+        for item in cart_items:
+            order_item_instance = OrderItem(
+            product=item.product,
+            order=order,
+            attributes_map=item.attributes_map,
+            quantity=item.quantity,
+            final_price=item.final_price
+            )
+            order_items_objs.append(order_item_instance)
+
+        OrderItem.objects.bulk_create(order_items_objs)
+        cart.clear()
         serializer = OrderSerializer(order, many=False)
         return Response(serializer.data)

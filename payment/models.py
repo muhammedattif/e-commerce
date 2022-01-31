@@ -24,6 +24,7 @@ class Cart(models.Model):
         self.sub_total = 0
         self.discount = 0
         self.items.all().delete()
+        self.save()
         return True
 
 class CartItem(models.Model):
@@ -45,10 +46,23 @@ class CartItem(models.Model):
 class Order(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='orders')
     address =models.ForeignKey(Address, on_delete=models.CASCADE)
-    items = models.ManyToManyField(CartItem)
     total = MoneyField(max_digits=14, decimal_places=4, default_currency='SAR')
     sub_total = MoneyField(max_digits=14, decimal_places=4, default_currency='SAR')
     discount = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR')
 
     def __str__(self):
           return self.user.username
+
+class OrderItem(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
+    attributes_map = models.ForeignKey(FeatureAttributesMap, on_delete=models.CASCADE)
+    creation = models.DateTimeField(auto_now_add=True)
+    quantity = models.PositiveIntegerField(blank=False, default=1, validators=[
+    MinValueValidator(1)
+    ])
+    final_price = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR')
+
+
+    def __str__(self):
+        return f'{self.product.name}-{self.attributes_map.id}'

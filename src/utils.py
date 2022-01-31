@@ -24,7 +24,8 @@ error_messages = {
     'page_access_denied': 'You don\'t have access to preview this page.',
     'invalid_params': "Invalid Parameters.",
     'out_of_stock': "Out of Stock.",
-    'product_not_available': "Product with selected features is not avilable."
+    'product_not_available': "Product with selected features is not avilable.",
+    'empty_cart': 'Cart is empty!'
 }
 
 success_messages = {

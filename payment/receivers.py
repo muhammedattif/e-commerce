@@ -20,7 +20,8 @@ def calculate_item_price(sender, instance=None, created=False, **kwargs):
         instance.final_price = final_price
 
         # Update Cart Prices Values
-        instance.cart.sub_total.amount += (final_price + discount.amount)
+        instance.cart.sub_total.amount += (final_price + (discount.amount * instance.quantity))
         instance.cart.total.amount += final_price
-        instance.cart.discount = discount
+        instance.cart.discount += discount*instance.quantity
         instance.cart.save()
+        instance.save()

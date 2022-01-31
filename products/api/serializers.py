@@ -44,6 +44,15 @@ class ProductsSerializer(serializers.ModelSerializer):
     def get_discount_percentage(self, product):
         return (product.discount/product.price)*100
 
+class CartProductSerializer(serializers.ModelSerializer):
+    discount_percentage = serializers.SerializerMethodField('get_discount_percentage')
+    class Meta:
+        model = Product
+        fields = ('id', 'name', 'price', 'discount', 'discount_percentage')
+
+    def get_discount_percentage(self, product):
+        return (product.discount/product.price)*100
+
 class SingleProductSerializer(serializers.ModelSerializer):
     rating = serializers.FloatField(source='get_rating')
     vendor = UserBasicInfoSerializer(many=False, read_only=True)

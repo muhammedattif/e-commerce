@@ -6,14 +6,20 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from users.api.serializers import UserBasicInfoSerializer
-from products.api.serializers import ProductsSerializer, FeatureAttributesMapSerializer
-from payment.models import Cart, CartItem, Order
+from products.api.serializers import CartProductSerializer, FeatureAttributesMapSerializer
+from payment.models import Cart, CartItem, Order, OrderItem
 
 UserModel = settings.AUTH_USER_MODEL
 
+class VendorOrderItemSerializer(serializers.ModelSerializer):
+    product = CartProductSerializer(many=False, read_only=True)
+    attributes_map = FeatureAttributesMapSerializer(many=False, read_only=True)
+    class Meta:
+        model = OrderItem
+        fields = '__all__'
 
 class CartItemSerializer(serializers.ModelSerializer):
-    product = ProductsSerializer(many=False, read_only=True)
+    product = CartProductSerializer(many=False, read_only=True)
     attributes_map = FeatureAttributesMapSerializer(many=False, read_only=True)
     class Meta:
         model = CartItem
