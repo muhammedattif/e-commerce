@@ -9,7 +9,7 @@ from django.db import transaction
 
 from users.api.serializers import UserBasicInfoSerializer
 from users.models import User
-from products.models import Product, ProductImage, Review, Feature, FeatureAttribute
+from products.models import Product, ProductImage, Review, Feature, FeatureAttribute, FeatureAttributesMap
 from categories.api.serializers import BrandSerializer, CategorySerializer
 
 class FeatureAttributeSerializer(serializers.ModelSerializer):
@@ -23,6 +23,12 @@ class FeatureSerializer(serializers.ModelSerializer):
         model = Feature
         fields = ('id', 'name', 'type', 'attributes')
 
+class FeatureAttributesMapSerializer(serializers.ModelSerializer):
+    attributes = FeatureAttributeSerializer(many=True, read_only=True)
+    class Meta:
+        model = FeatureAttributesMap
+        fields = '__all__'
+
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
         model = ProductImage
@@ -33,7 +39,7 @@ class ProductsSerializer(serializers.ModelSerializer):
     discount_percentage = serializers.SerializerMethodField('get_discount_percentage')
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'quantity', 'rating', 'creation')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'rating', 'creation')
 
     def get_discount_percentage(self, product):
         return (product.discount/product.price)*100
@@ -50,7 +56,7 @@ class SingleProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'quantity', 'rating', 'features', 'category', 'brand', 'images', 'vendor', 'creation', 'relevant_products')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'rating', 'features', 'category', 'brand', 'images', 'vendor', 'creation', 'relevant_products')
 
 
     def get_relevant_products(self, product):
@@ -68,7 +74,7 @@ class VendorProductsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'quantity', 'features', 'category', 'brand', 'images')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'features', 'category', 'brand', 'images')
 
 class VendorReviewsSerializer(serializers.ModelSerializer):
     user = UserBasicInfoSerializer(many=False, read_only=True)
@@ -80,7 +86,7 @@ class VendorReviewsSerializer(serializers.ModelSerializer):
 class ProductCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('name', 'description', 'price', 'discount', 'quantity')
+        fields = ('name', 'description', 'price', 'discount')
 
 class ReviewSerializer(serializers.ModelSerializer):
     user = UserBasicInfoSerializer(many=False, read_only=True)

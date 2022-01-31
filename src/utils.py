@@ -10,7 +10,7 @@ def success(success_key):
     return {
         'status': True,
         'message': 'success',
-        'error_description': success_messages[success_key]
+        'success_description': success_messages[success_key]
     }
 
 error_messages = {
@@ -22,7 +22,11 @@ error_messages = {
     'question_not_found': 'This question does not exists.',
     'choice_not_found': 'The answer must be one of the choices.',
     'page_access_denied': 'You don\'t have access to preview this page.',
-    'invalid_params': "Invalid Parameters."
+    'invalid_params': "Invalid Parameters.",
+    'out_of_stock': "Out of Stock.",
+    'product_not_available': "Product with selected features is not avilable."
 }
 
-success_messages = {}
+success_messages = {
+    'product_available': "Product with selected features is avilable."
+}

@@ -3,6 +3,7 @@ from django.dispatch import receiver
 from .models import VendorProfile, CustomerProfile
 from rest_framework.authtoken.models import Token
 from django.conf import settings
+from payment.models import Cart
 
 UserModel = settings.AUTH_USER_MODEL
 
@@ -18,3 +19,8 @@ def create_user_profile(sender, instance=None, created=False, **kwargs):
             VendorProfile.objects.create(user=instance)
         else:
             CustomerProfile.objects.create(user=instance)
+
+@receiver(post_save, sender=UserModel)
+def create_user_cart(sender, instance=None, created=False, **kwargs):
+    if created:
+        Cart.objects.create(user=instance)

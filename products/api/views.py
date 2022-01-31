@@ -13,13 +13,13 @@ from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.db import transaction
 import src.utils as general_utils
-from products.models import Product, ProductImage, Feature, FeatureAttribute
+from products.models import Product, ProductImage, Feature, FeatureAttribute, FeatureAttributesMap
 import products.utils as utils
 from .serializers import *
 from src.custom_permissions import IsPostOrIsAuthenticated
 import json
 from rest_framework.generics import ListAPIView
-from django.db.models import Q
+from django.db.models import Q, Count
 from functools import reduce
 import operator
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
@@ -141,3 +141,45 @@ class CheckReview(APIView):
             response['reviewd'] = False
 
         return Response(response)
+
+class ProductAvailability(APIView):
+
+    def post(self, request, id):
+
+        if 'attributes' not in request.data:
+            return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
+
+        attributes = request.data['attributes']
+        attributes_len = len(attributes)
+
+        quantity = 1
+        if 'quantity' in request.data:
+            quantity = request.data['quantity']
+
+
+
+        product, found, error = utils.get_product(id)
+        if not found:
+            return Response(error, status=status.HTTP_404_NOT_FOUND)
+
+        try:
+            feature_map = FeatureAttributesMap.objects.annotate(
+                                                        total_attributes=Count('attributes'),
+                                                        matching_attributes=Count('attributes', filter=Q(attributes__in=attributes))
+                                                    ).filter(
+                                                        product__id=id,
+                                                        matching_attributes=attributes_len,
+                                                        total_attributes=attributes_len
+                                                    ).first()
+            if not feature_map:
+                return Response(general_utils.error('product_not_available'), status=status.HTTP_404_NOT_FOUND)
+
+            if not feature_map.quantity or feature_map.quantity < quantity:
+                return Response(general_utils.error('out_of_stock'), status=status.HTTP_404_NOT_FOUND)
+
+            response = general_utils.success('product_available')
+            response.update({'map_id': feature_map.id})
+            return Response(response)
+
+        except ValueError:
+            return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)

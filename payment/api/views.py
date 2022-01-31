@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.db.models import Sum
 import src.utils as general_utils
-from payment.models import CartItem, Order
+from payment.models import Cart, CartItem, Order
 import payment.utils as utils
 from .serializers import *
 from djmoney.money import Money
@@ -15,8 +15,9 @@ from users.models import Address
 class BaseListCreateCartItemView(APIView):
 
     def get(self, request, format=None):
-        cart_items = request.user.cart.all()
-        serializer = CartItemSerializer(cart_items, many=True, context={'request': request})
+        cart = Cart.objects.prefetch_related('items__product__reviews', 'items__attributes_map__attributes').get(user=request.user)
+        serializer = CartSerializer(cart, many=False, context={'request': request})
+        cart.clear()
         return Response(serializer.data)
 
     def post(self, request):
@@ -38,7 +39,7 @@ class CheckoutView(APIView):
         except Exception as e:
             error = general_utils.error('invalid_params')
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
-            
+
         cart_items = CartItem.objects.select_related('user','product').filter(user=request.user)
         cart_items_sub_total = cart_items.aggregate(sum=Sum('product__price'))['sum']
         cart_items_discounts = cart_items.aggregate(sum=Sum('product__discount'))['sum']
