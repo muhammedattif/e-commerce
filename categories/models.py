@@ -20,7 +20,7 @@ class Category(MPTTModel):
         blank=True,
         null=True,
         related_name='childs',
-        on_delete=models.CASCADE
+        on_delete=models.SET_NULL
     )
 
     class Meta:
