@@ -11,17 +11,30 @@ import payment.utils as utils
 from .serializers import *
 from djmoney.money import Money
 from users.models import Address
+from products.models import FeatureAttributesMap
 
 class BaseListCreateCartItemView(APIView):
 
     def get(self, request, format=None):
         cart = Cart.objects.prefetch_related('items__product__reviews', 'items__attributes_map__attributes').get(user=request.user)
         serializer = CartSerializer(cart, many=False, context={'request': request})
-        cart.clear()
         return Response(serializer.data)
 
     def post(self, request):
-        serializer = CartItemCreateSerializer(data=request.data, context={'request': request})
+
+        data = request.data
+        data.update({'cart': request.user.cart.id})
+
+        valid_attributes_map = FeatureAttributesMap.objects.filter(
+        id=data['attributes_map'],
+        product__id=data['product']
+        ).exists()
+
+        if not valid_attributes_map:
+            error = general_utils.error('invalid_params')
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer = CartItemCreateSerializer(data=data, context={'request': request})
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

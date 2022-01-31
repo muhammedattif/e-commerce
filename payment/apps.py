@@ -6,4 +6,4 @@ class PaymentConfig(AppConfig):
     name = 'payment'
 
     def ready(self):
-        import users.receivers
+        import payment.receivers

@@ -1,4 +1,5 @@
 from django.db import models
+from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from ckeditor_uploader.fields import RichTextUploadingField
 from users.models import User
@@ -20,13 +21,13 @@ class Product(models.Model):
     description = RichTextUploadingField(blank=True)
     price = MoneyField(max_digits=14, decimal_places=4, default=1,
         validators=[
-        MinValueValidator(1)
-        ])
+        MinMoneyValidator(1)
+        ], default_currency='SAR')
 
     discount = MoneyField(max_digits=14, decimal_places=4, default=0,
         validators=[
-        MinValueValidator(0)
-        ])
+        MinMoneyValidator(0)
+        ], default_currency='SAR')
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="products")
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, related_name="products")
     creation = models.DateTimeField(blank=True, auto_now_add=True)
@@ -85,8 +86,8 @@ class FeatureAttribute(models.Model):
     name = models.CharField(max_length=100)
     additional_price = MoneyField(max_digits=14, decimal_places=4, default=0,
     validators=[
-    MinValueValidator(0)
-    ])
+    MinMoneyValidator(0)
+    ], default_currency='SAR')
 
     def __str__(self):
         return f'{self.feature.product}-{self.feature.name}-{self.name}'

@@ -1,4 +1,5 @@
 from django.db import models
+from djmoney.models.validators import MinMoneyValidator
 from django.core.validators import MinValueValidator
 from djmoney.models.fields import MoneyField
 from django.conf import settings
@@ -10,9 +11,9 @@ UserModel = settings.AUTH_USER_MODEL
 
 class Cart(models.Model):
     user = models.OneToOneField(UserModel, on_delete=models.CASCADE, related_name='cart')
-    total = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True)
-    sub_total = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True)
-    discount = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True)
+    total = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True, default_currency='SAR')
+    sub_total = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True, default_currency='SAR')
+    discount = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True, default_currency='SAR')
     creation = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
@@ -33,14 +34,11 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(blank=False, default=1, validators=[
     MinValueValidator(1)
     ])
+    final_price = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR')
 
-    TAX_AMOUNT = 14.0
 
     def __str__(self):
-        return self.product.name
-
-    def get_final_price(self):
-        return self.product.price * (1 + self.TAX_AMOUNT/100.0)
+        return f'{self.product.name}-{self.attributes_map.id}'
 
 
 
@@ -48,9 +46,9 @@ class Order(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='orders')
     address =models.ForeignKey(Address, on_delete=models.CASCADE)
     items = models.ManyToManyField(CartItem)
-    total = MoneyField(max_digits=14, decimal_places=4)
-    sub_total = MoneyField(max_digits=14, decimal_places=4)
-    discount = MoneyField(max_digits=14, decimal_places=4, default=0)
+    total = MoneyField(max_digits=14, decimal_places=4, default_currency='SAR')
+    sub_total = MoneyField(max_digits=14, decimal_places=4, default_currency='SAR')
+    discount = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR')
 
     def __str__(self):
           return self.user.username

@@ -173,13 +173,12 @@ MEDIA_URL = '/media/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# Days to delete files in Trash
-TRASH_DAYS = 30
-
-SUB_FOLDERS_LIMIT = 10
 
 # Directory where users uploads are gonna be stored
 PROFILE_IMAGES_URL = 'profile_images'
 
 # CK Editor settings
 CKEDITOR_UPLOAD_PATH = "products_uploads/"
+
+
+TAX_AMOUNT = 14.0
