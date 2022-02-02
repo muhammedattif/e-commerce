@@ -75,9 +75,10 @@ class StockCreateListRetriveAPIView(APIView):
 
         # Check if attribues belongs to this product
         product_attributes = FeatureAttribute.objects.filter(feature__product=product).values_list('id', flat=True)
-        match = set(attributes).issubset(product_attributes)
-        if not match:
-            return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
+        if attributes:
+            match = set(attributes).issubset(product_attributes)
+            if not match:
+                return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
 
         stock = Stock.objects.create(product=product)
 
