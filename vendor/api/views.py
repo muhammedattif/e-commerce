@@ -80,12 +80,13 @@ class StockCreateListRetriveAPIView(APIView):
             if not match:
                 return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
 
-        stock = Stock.objects.create(product=product)
+
 
         try:
+            stock = Stock.objects.create(product=product)
             stock.attributes.set(attributes)
-        except IntegrityError:
-            error = general_utils.error('stock_already_exists')
+        except IntegrityError as e:
+            error = general_utils.error('stock_already_exists', error_description=str(e))
             return Response(error)
 
         serializer = StockSerializer(stock, many=False)
