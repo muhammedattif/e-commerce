@@ -9,7 +9,7 @@ from django.db import transaction
 
 from users.api.serializers import UserBasicInfoSerializer
 from users.models import User
-from products.models import Product, ProductImage, Review, Feature, FeatureAttribute, FeatureAttributesMap
+from products.models import Product, ProductImage, Review, Feature, FeatureAttribute
 from categories.api.serializers import BrandSerializer, CategorySerializer
 
 class FeatureAttributeSerializer(serializers.ModelSerializer):
@@ -21,13 +21,7 @@ class FeatureSerializer(serializers.ModelSerializer):
     attributes = FeatureAttributeSerializer(many=True, read_only=True)
     class Meta:
         model = Feature
-        fields = ('id', 'name', 'type', 'attributes')
-
-class FeatureAttributesMapSerializer(serializers.ModelSerializer):
-    attributes = FeatureAttributeSerializer(many=True, read_only=True)
-    class Meta:
-        model = FeatureAttributesMap
-        fields = '__all__'
+        fields = ('id', 'name', 'attributes')
 
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -62,10 +56,11 @@ class SingleProductSerializer(serializers.ModelSerializer):
     brand = BrandSerializer(many=False, read_only=True)
     relevant_products = serializers.SerializerMethodField('get_relevant_products')
     discount_percentage = serializers.SerializerMethodField('get_discount_percentage')
+    quantity = serializers.SerializerMethodField('get_quantity')
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'rating', 'features', 'category', 'brand', 'images', 'vendor', 'creation', 'relevant_products')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'rating', 'quantity', 'features', 'category', 'brand', 'images', 'vendor', 'creation', 'relevant_products')
 
 
     def get_relevant_products(self, product):
@@ -74,6 +69,9 @@ class SingleProductSerializer(serializers.ModelSerializer):
 
     def get_discount_percentage(self, product):
         return (product.discount/product.price)*100
+
+    def get_quantity(self, product):
+        return product.get_quantity()
 
 class VendorProductsSerializer(serializers.ModelSerializer):
     features = FeatureSerializer(many=True, read_only=True)

@@ -3,7 +3,7 @@ from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from ckeditor_uploader.fields import RichTextUploadingField
 from users.models import User
-from django.db.models import JSONField, Q, Count
+from django.db.models import JSONField, Q, Count, Sum, F
 from categories.models import Category, Brand
 from djmoney.models.fields import MoneyField
 from django.db.models.signals import m2m_changed
@@ -67,13 +67,16 @@ class Product(models.Model):
 
         return round(total_score/total_reviews, 1)
 
+    def get_quantity(self):
+        quantity = self.stock.aggregate(sum=Sum(F('quantity')))['sum']
+        return quantity
+
     def get_relevant_products(self):
         return self.category.products.all()[:5]
 
 class Feature(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')
     name = models.CharField(max_length=100)
-    type = models.CharField(max_length=100)
 
     class Meta:
         unique_together = ('product', 'name')
@@ -89,40 +92,11 @@ class FeatureAttribute(models.Model):
     MinMoneyValidator(0)
     ], default_currency='SAR')
 
+    class Meta:
+        unique_together = ('feature', 'name')
+
     def __str__(self):
         return f'{self.feature.product}-{self.feature.name}-{self.name}'
-
-class FeatureAttributesMap(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features_attributes_maps')
-    attributes = models.ManyToManyField(FeatureAttribute)
-    quantity = models.PositiveSmallIntegerField(default=1,
-        validators=[
-        MinValueValidator(0)
-        ])
-
-    def __str__(self):
-          return self.product.name
-
-
-@receiver(m2m_changed, sender=FeatureAttributesMap.attributes.through)
-def verify_uniqueness(sender, **kwargs):
-    features_attribute_map = kwargs.get('instance', None)
-    action = kwargs.get('action', None)
-    attributes = kwargs.get('pk_set', None)
-    attributes_len = len(attributes)
-
-    if action == 'pre_add':
-        quesrset = FeatureAttributesMap.objects.annotate(
-                                                    total_attributes=Count('attributes'),
-                                                    matching_attributes=Count('attributes', filter=Q(attributes__in=attributes))
-                                                ).filter(
-                                                    product=features_attribute_map.product,
-                                                    matching_attributes=attributes_len,
-                                                    total_attributes=attributes_len
-                                                ).first()
-
-        if quesrset:
-            raise IntegrityError('Map with Product %s already exists for Attributes %s' % (features_attribute_map.product, attributes))
 
 
 # Product Images Model

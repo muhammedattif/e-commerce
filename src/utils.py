@@ -1,17 +1,23 @@
 
-def error(error_key):
-    return {
-        'status': False,
-        'message': 'error',
-        'error_description': error_messages[error_key]
-    }
+def error(error_key, **extra_data):
 
-def success(success_key):
-    return {
+    error_dict = {
+            'status': False,
+            'message': 'error',
+            'error_description': error_messages[error_key],
+            **extra_data
+        }
+
+    return error_dict
+
+def success(success_key, **extra_data):
+    success_dict = {
         'status': True,
         'message': 'success',
-        'success_description': success_messages[success_key]
+        'success_description': success_messages[success_key],
+        **extra_data
     }
+    return success_dict
 
 error_messages = {
     'not_vendor': 'You must be a Vendor to add Products.',
@@ -25,7 +31,9 @@ error_messages = {
     'invalid_params': "Invalid Parameters.",
     'out_of_stock': "Out of Stock.",
     'product_not_available': "Product with selected features is not avilable.",
-    'empty_cart': 'Cart is empty!'
+    'empty_cart': 'Cart is empty!',
+    'invalid_address': 'Address does not exist!',
+    'stock_already_exists': 'Product with these features already exists, try to update it insted of creating a new one.'
 }
 
 success_messages = {

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, ProductImage, Feature, FeatureAttribute, FeatureAttributesMap, Review
+from .models import Product, ProductImage, Feature, FeatureAttribute, Review
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
 class FeatureAttributeInline(NestedStackedInline):
@@ -30,23 +30,9 @@ class ProductConfig(NestedModelAdmin):
     list_filter = ('vendor', 'name', 'price', 'discount', 'creation')
     list_display = ('vendor', 'name', 'price', 'discount', 'creation')
 
-class FeatureAttributesMapConfig(admin.ModelAdmin):
-    model = FeatureAttributesMap
-
-    list_filter = ('product', 'quantity')
-    list_display = ('product', 'quantity')
-
-    def get_queryset(self, request):
-        queryset = super(FeatureAttributesMapConfig, self).get_queryset(request)
-        queryset = queryset.select_related('product').prefetch_related('attributes')
-        return queryset
-
-
-
 
 admin.site.register(Review, ReviewConfig)
 admin.site.register(Product, ProductConfig)
 admin.site.register(Feature)
 admin.site.register(FeatureAttribute)
-admin.site.register(FeatureAttributesMap, FeatureAttributesMapConfig)
 admin.site.register(ProductImage)
