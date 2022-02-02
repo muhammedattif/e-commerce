@@ -2,8 +2,8 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from products.models import Product, Review, FeatureAttribute
-from products.api.serializers import ReviewSerializer, VendorProductsSerializer, VendorReviewsSerializer
+from products.models import Product, Review, Feature, FeatureAttribute
+from products.api.serializers import ReviewSerializer, VendorProductsSerializer, VendorReviewsSerializer, FeatureSerializer
 from payment.api.serializers import VendorOrderItemSerializer
 from payment.models import OrderItem
 from products import utils as product_utils
@@ -42,6 +42,7 @@ class VendorOrderList(ListAPIView):
 class StockAPIView(ListAPIView):
     serializer_class = StockItemSerializer
 
+    # TODO: Change it to use product.get_quantity
     def get_queryset(self):
         queryset = Stock.objects.select_related('product').values('product').filter(product__vendor=self.request.user).annotate(quantity=Sum(F('quantity')))
         return queryset
@@ -58,6 +59,22 @@ class StockCreateListRetriveAPIView(APIView):
         product_stock = Stock.objects.prefetch_related('attributes').filter(product=product)
         serializer = StockSerializer(product_stock, many=True)
         return Response(serializer.data)
+
+    def put(self, request, id):
+
+        if not ('stock_id' and 'quantity') in request.data:
+            return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
+
+        stock_id = request.data['stock_id']
+        quantity = request.data['quantity']
+
+        updated = Stock.objects.filter(id=stock_id, product__id=id).update(quantity=quantity)
+        if not updated:
+            return Response(general_utils.error('not_updated'), status=status.HTTP_400_BAD_REQUEST)
+
+        success_response = general_utils.success('updated_successfully')
+        return Response(success_response)
+
 
     @transaction.atomic
     def post(self, request, id):
@@ -90,4 +107,20 @@ class StockCreateListRetriveAPIView(APIView):
             return Response(error)
 
         serializer = StockSerializer(stock, many=False)
+        return Response(serializer.data)
+
+
+class ProductStockFeaturesAPIView(APIView):
+
+    def get(self, request, id):
+
+        if not request.user.is_vendor:
+            return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
+
+        product, found, error = product_utils.get_product(id, prefetch_related=['features'])
+        if not found:
+            return Response(error, status=status.HTTP_404_NOT_FOUND)
+
+        features = product.features.all()
+        serializer = FeatureSerializer(features, many=True)
         return Response(serializer.data)

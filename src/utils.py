@@ -33,9 +33,11 @@ error_messages = {
     'product_not_available': "Product with selected features is not avilable.",
     'empty_cart': 'Cart is empty!',
     'invalid_address': 'Address does not exist!',
-    'stock_already_exists': 'Product with these features already exists, try to update it insted of creating a new one.'
+    'stock_already_exists': 'Product with these features already exists, try to update it insted of creating a new one.',
+    'not_updated': "Not Updated."
 }
 
 success_messages = {
-    'product_available': "Product with selected features is avilable."
+    'product_available': "Product with selected features is avilable.",
+    'updated_successfully': "Updated successfully."
 }
