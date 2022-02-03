@@ -49,6 +49,7 @@ INSTALLED_APPS = [
     'django.contrib.redirects',
     'django.contrib.sites',
     'rest_framework',
+    'django_rest_passwordreset',
     'rest_framework.authtoken',
     'nested_inline',
     # for scanning from virus
@@ -182,3 +183,39 @@ CKEDITOR_UPLOAD_PATH = "products_uploads/"
 
 
 TAX_AMOUNT = 14.0
+
+#Email BACKEND
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_USE_TLS = True
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'emtyazadvisor.smtp@gmail.com'
+EMAIL_HOST_PASSWORD = 'jciqufezvdxbeyoa'
+EMAIL_TIMEOUT = 20 #Time in seconds
+
+# REST_FRAMEWORK Rest Password
+DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
+    "CLASS": "django_rest_passwordreset.tokens.RandomStringTokenGenerator",
+    "OPTIONS": {
+        "min_length": 20,
+        "max_length": 30
+    }
+}
+DJANGO_REST_MULTITOKENAUTH_RESET_TOKEN_EXPIRY_TIME = 1 # Time in hours
+
+
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
