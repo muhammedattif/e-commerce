@@ -15,4 +15,7 @@ urlpatterns = [
     # Reset Password
     path('reset-password/', include('django_rest_passwordreset.urls', namespace='reset-password')),
     path('reset_password/confirm/', ResetPasswordConfirmView.as_view(), name='reset-password-confirm'),
+
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.jwt')),
   ]

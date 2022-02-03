@@ -7,6 +7,8 @@ from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import transaction
+from django.contrib.auth import get_user_model
+User = get_user_model()
 
 class SignUpSerializer(serializers.ModelSerializer):
 
