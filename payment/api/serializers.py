@@ -41,7 +41,17 @@ class CartItemCreateSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def create(self, validated_data):
-        cart_item = CartItem.objects.create(**validated_data)
+        cart_item, created = CartItem.objects.get_or_create(
+        product=validated_data['product'],
+        stock=validated_data['stock'],
+        cart=validated_data['cart']
+        )
+
+        if not created:
+            cart_item.quantity += validated_data['quantity']
+        else:
+            cart_item.quantity = validated_data['quantity']
+        cart_item.save()
         return cart_item
 
 class OrderSerializer(serializers.ModelSerializer):

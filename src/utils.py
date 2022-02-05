@@ -30,17 +30,19 @@ error_messages = {
     'page_access_denied': 'You don\'t have access to preview this page.',
     'invalid_params': "Invalid Parameters.",
     'out_of_stock': "Out of Stock.",
-    'product_not_available': "Product with selected features is not avilable.",
+    'product_not_available': "Product is not avilable.",
     'empty_cart': 'Cart is empty!',
     'invalid_address': 'Address does not exist!',
     'stock_already_exists': 'Product with these features already exists, try to update it insted of creating a new one.',
     'not_updated': "Not Updated.",
     'wrong_old_password': "Old password is wrong.",
-    'invalid_url': 'Invalid URL.'
+    'invalid_url': 'Invalid URL.',
+    'invalid_quantity_value': 'Product quantity not available right now.'
 }
 
 success_messages = {
     'product_available': "Product with selected features is avilable.",
     'updated_successfully': "Updated successfully.",
+    'deleted_successfully': "Deleted successfully.",
     'password_reset_successfully': "Password has been reset."
 }

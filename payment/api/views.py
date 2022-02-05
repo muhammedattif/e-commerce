@@ -27,13 +27,17 @@ class BaseListCreateCartItemView(APIView):
         data = request.data
         data.update({'cart': request.user.cart.id})
 
-        valid_stock = Stock.objects.filter(
-        id=data['stock'],
-        product__id=data['product']
-        ).exists()
-
-        if not valid_stock:
+        try:
+            stock = Stock.objects.get(
+            id=data['stock'],
+            product__id=data['product']
+            )
+        except Stock.DoesNotExist:
             error = general_utils.error('invalid_params')
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+        if data['quantity'] > stock.quantity:
+            error = general_utils.error('product_not_available')
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = CartItemCreateSerializer(data=data, context={'request': request})
@@ -43,6 +47,41 @@ class BaseListCreateCartItemView(APIView):
         cart_item = serializer.save()
         serializer = CartItemSerializer(cart_item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class CartItemView(APIView):
+
+    def put(self, request, id):
+
+        quantity = request.data['quantity']
+
+        try:
+            cart_item = CartItem.objects.select_related('stock').get(id=id, cart=request.user.cart)
+        except CartItem.DoesNotExist:
+            error = general_utils.error('invalid_url')
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+        if quantity > cart_item.stock.quantity:
+            error = general_utils.error('product_not_available')
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+        cart_item.quantity = quantity
+        cart_item.save()
+
+        success = general_utils.success('updated_successfully')
+        return Response(success)
+
+    def delete(self, request, id):
+
+        try:
+            cart_item = CartItem.objects.get(id=id, cart=request.user.cart)
+        except CartItem.DoesNotExist:
+            error = general_utils.error('invalid_url')
+            return Response(error, status=status.HTTP_400_BAD_REQUEST)
+            
+        cart_item.delete()
+        success = general_utils.success('deleted_successfully')
+        return Response(success)
 
 
 class CheckoutView(APIView):
@@ -61,15 +100,24 @@ class CheckoutView(APIView):
             error = general_utils.error('invalid_address')
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
-
-        cart = Cart.objects.prefetch_related('items__product', 'items__stock__attributes').get(user=request.user)
+        cart = Cart.objects.get(user=request.user)
 
         # Get cart items
-        cart_items = cart.items.all()
-
+        cart_items = CartItem.objects.select_related('stock', 'product', 'cart').prefetch_related('stock__product').filter(cart=cart)
         if not cart_items:
             error = general_utils.error('empty_cart')
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
+
+        # TODO: Check if all items quantity available
+        for item in cart_items:
+            if item.quantity > item.stock.quantity:
+                error = general_utils.error('invalid_quantity_value',
+                product_name=item.product.name,
+                available_quantity=item.stock.quantity
+                )
+                return Response(error, status=status.HTTP_404_NOT_FOUND)
+
+        cart.recalculate_cart_amount()
 
         order = Order.objects.create(
                 user=request.user,
@@ -90,8 +138,11 @@ class CheckoutView(APIView):
             quantity=item.quantity
             )
             order_items_objs.append(order_item_instance)
+            item.stock.quantity = F('quantity') - item.quantity
+            item.stock.save()
 
         OrderItem.objects.bulk_create(order_items_objs)
         cart.clear()
         serializer = OrderSerializer(order, many=False)
-        return Response(serializer.data)
+        data = serializer.data
+        return Response(data)
