@@ -117,10 +117,10 @@ class ProductStockFeaturesAPIView(APIView):
         if not request.user.is_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
-        product, found, error = product_utils.get_product(id, prefetch_related=['features'])
+        product, found, error = product_utils.get_product(id)
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
-        features = product.features.all()
+        features = Feature.objects.prefetch_related('attributes').annotate(attributes_num=Count('attributes')).filter(product=product, attributes_num__gt=1)
         serializer = FeatureSerializer(features, many=True)
         return Response(serializer.data)
