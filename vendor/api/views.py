@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
 from products.models import Product, Review, Feature, FeatureOption
-from products.api.serializers import ReviewSerializer, VendorProductsSerializer, VendorReviewsSerializer, FeatureSerializer
+from products.api.serializers import ReviewSerializer, VendorProductsSerializer, VendorProductSerializer, VendorReviewsSerializer, FeatureSerializer
 from orders.api.serializers import VendorOrderItemSerializer
 from orders.models import OrderItem
 from products import utils as product_utils
@@ -18,11 +18,23 @@ class VendorProductList(ListAPIView):
     serializer_class = VendorProductsSerializer
 
     def get_queryset(self):
-        queryset = Product.objects.select_related('category', 'brand', 'vendor'
-        ).prefetch_related('features__options', 'category__childs', 'images', 'reviews'
-        ).filter(vendor=self.request.user)
+        queryset = Product.objects.filter(vendor=self.request.user)
         return queryset
 
+
+class VendorProductDetail(APIView):
+    def get(self, request, id):
+
+        try:
+            product = Product.objects.select_related('category', 'brand', 'vendor'
+            ).prefetch_related('features__options', 'category__childs', 'images', 'reviews'
+            ).get(id=id, vendor=self.request.user)
+        except Product.DoesNotExist:
+            error = general_utils.error('product_not_found')
+            return Response(error, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = VendorProductSerializer(product, many=False)
+        return Response(serializer.data)
 
 class VendorProductReviewsList(ListAPIView):
     serializer_class = VendorReviewsSerializer

@@ -74,6 +74,11 @@ class SingleProductSerializer(serializers.ModelSerializer):
         return product.quantity
 
 class VendorProductsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Product
+        fields = ('id', 'name', 'description', 'price')
+
+class VendorProductSerializer(serializers.ModelSerializer):
     features = FeatureSerializer(many=True, read_only=True)
     images = ProductImageSerializer(many=True, read_only=True)
     category = CategorySerializer(many=False, read_only=True)
