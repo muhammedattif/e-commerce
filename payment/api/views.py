@@ -111,7 +111,8 @@ class CheckoutView(APIView):
             error = general_utils.error('empty_cart')
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
-        # TODO: Check if all items quantity available
+        # Check if all items quantity available
+        # Cart items may be added for a long time
         for item in cart_items:
             if item.quantity > item.stock.quantity:
                 error = general_utils.error('invalid_quantity_value',

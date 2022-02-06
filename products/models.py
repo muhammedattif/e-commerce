@@ -31,7 +31,6 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="products")
     brand = models.ForeignKey(Brand, on_delete=models.SET_DEFAULT, default=1, related_name="products")
     creation = models.DateTimeField(blank=True, auto_now_add=True)
-    # data = JSONField(db_index=True)
 
     class Meta:
         ordering = ('-creation',)

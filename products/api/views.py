@@ -82,7 +82,10 @@ class ProductDetail(APIView):
     permission_classes = ()
 
     def get(self, request, id):
-        product, found, error = utils.get_product(id, select_related=['category', 'vendor'], prefetch_related=['features__options', 'images', 'reviews', 'category__products__reviews'])
+        filter_kwargs = {
+        'id': id
+        }
+        product, found, error = utils.get_product(filter_kwargs, select_related=['category', 'vendor'], prefetch_related=['features__options', 'images', 'reviews', 'category__products__reviews'])
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
@@ -95,7 +98,10 @@ class ReviewsListCreateView(APIView):
     permission_classes = (IsGetOrIsAuthenticated,)
 
     def get(self, request, id):
-        product, found, error = utils.get_product(id)
+        filter_kwargs = {
+        'id': id
+        }
+        product, found, error = utils.get_product(filter_kwargs)
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
@@ -105,7 +111,10 @@ class ReviewsListCreateView(APIView):
 
     def post(self, request, id):
 
-        product, found, error = utils.get_product(id)
+        filter_kwargs = {
+        'id': id
+        }
+        product, found, error = utils.get_product(filter_kwargs)
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
@@ -153,7 +162,10 @@ class ProductAvailability(APIView):
             quantity = request.data['quantity']
 
 
-        product, found, error = utils.get_product(id)
+        filter_kwargs = {
+        'id': id
+        }
+        product, found, error = utils.get_product(filter_kwargs)
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 

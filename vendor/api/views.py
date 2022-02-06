@@ -39,20 +39,23 @@ class VendorOrderList(ListAPIView):
         queryset = OrderItem.objects.filter(product__vendor=self.request.user)
         return queryset
 
-class StockAPIView(ListAPIView):
-    serializer_class = StockItemSerializer
+class StockAPIView(APIView):
 
-    # TODO: Change it to use product.get_quantity
-    def get_queryset(self):
-        queryset = Stock.objects.select_related('product').values('product').filter(product__vendor=self.request.user).annotate(quantity=Sum(F('quantity')))
-        return queryset
+    def get(self, request):
+        stock_items = Product.objects.filter(~Q(stock=None), vendor=request.user).annotate(quantity=Sum(F('stock__quantity')))
+        serializer = StockItemSerializer(stock_items, many=True)
+        return Response(serializer.data)
 
 
 class StockCreateListRetriveAPIView(APIView):
 
     def get(self, request, id):
 
-        product, found, error = product_utils.get_product(id, select_related=['category', 'vendor'])
+        filter_kwargs = {
+        'id': id,
+        'vendor': request.user
+        }
+        product, found, error = product_utils.get_product(filter_kwargs, select_related=['category', 'vendor'])
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
@@ -62,13 +65,16 @@ class StockCreateListRetriveAPIView(APIView):
 
     def put(self, request, id):
 
+        if not request.user.is_vendor:
+            return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
+
         if not ('stock_id' and 'quantity') in request.data:
             return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
 
         stock_id = request.data['stock_id']
         quantity = request.data['quantity']
 
-        updated = Stock.objects.filter(id=stock_id, product__id=id).update(quantity=quantity)
+        updated = Stock.objects.filter(id=stock_id, product__id=id, product__vendor=request.user).update(quantity=quantity)
         if not updated:
             return Response(general_utils.error('not_updated'), status=status.HTTP_400_BAD_REQUEST)
 
@@ -86,7 +92,11 @@ class StockCreateListRetriveAPIView(APIView):
             return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
 
         options = request.data['options']
-        product, found, error = product_utils.get_product(id, select_related=['category', 'vendor'])
+        filter_kwargs = {
+        'id': id,
+        'vendor': request.user
+        }
+        product, found, error = product_utils.get_product(filter_kwargs, select_related=['category', 'vendor'])
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
@@ -96,8 +106,6 @@ class StockCreateListRetriveAPIView(APIView):
             match = set(options).issubset(product_options)
             if not match:
                 return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
-
-
 
         try:
             stock = Stock.objects.create(product=product)
@@ -117,7 +125,11 @@ class ProductStockFeaturesAPIView(APIView):
         if not request.user.is_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
-        product, found, error = product_utils.get_product(id)
+        filter_kwargs = {
+        'id': id,
+        'vendor': request.user
+        }
+        product, found, error = product_utils.get_product(filter_kwargs)
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 

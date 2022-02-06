@@ -11,11 +11,11 @@ class StockSerializer(serializers.ModelSerializer):
         model = Stock
         fields = '__all__'
 
-class StockItemSerializer(serializers.Serializer):
-    product = serializers.SerializerMethodField('get_product')
-    quantity = serializers.IntegerField()
+class StockItemSerializer(serializers.ModelSerializer):
+    quantity = serializers.SerializerMethodField('get_quantity')
+    class Meta:
+        model = Product
+        fields = ('id', 'name', 'price', 'quantity')
 
-    def get_product(self, obj):
-        priduct = Product.objects.get(id=obj['product'])
-        serializer = ProductsSerializer(priduct, many=False)
-        return serializer.data
+    def get_quantity(self, product):
+        return product.quantity
