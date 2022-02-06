@@ -71,7 +71,7 @@ class SingleProductSerializer(serializers.ModelSerializer):
         return (product.discount/product.price)*100
 
     def get_quantity(self, product):
-        return product.get_quantity()
+        return product.quantity
 
 class VendorProductsSerializer(serializers.ModelSerializer):
     features = FeatureSerializer(many=True, read_only=True)

@@ -82,11 +82,14 @@ class ProductDetail(APIView):
     permission_classes = ()
 
     def get(self, request, id):
-        filter_kwargs = {
-        'id': id
-        }
-        product, found, error = utils.get_product(filter_kwargs, select_related=['category', 'vendor'], prefetch_related=['features__options', 'images', 'reviews', 'category__products__reviews'])
-        if not found:
+        try:
+            product = Product.objects.select_related(
+            'category', 'vendor'
+            ).prefetch_related(
+            'features__options', 'images', 'reviews', 'category__products__reviews'
+            ).annotate(quantity=Sum(F('stock__quantity'))).get(id=id)
+        except Product.DoesNotExist:
+            error = general_utils.error('product_not_found')
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
         serializer = SingleProductSerializer(product, many=False, context={'request': request})
