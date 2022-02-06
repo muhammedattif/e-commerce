@@ -17,7 +17,7 @@ from django.db import transaction
 class BaseListCreateCartItemView(APIView):
 
     def get(self, request, format=None):
-        cart = Cart.objects.prefetch_related('items__product', 'items__stock__attributes').get(user=request.user)
+        cart = Cart.objects.prefetch_related('items__product', 'items__stock__options').get(user=request.user)
         cart.recalculate_cart_amount()
         serializer = CartSerializer(cart, many=False, context={'request': request})
         return Response(serializer.data)
@@ -78,7 +78,7 @@ class CartItemView(APIView):
         except CartItem.DoesNotExist:
             error = general_utils.error('invalid_url')
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
-            
+
         cart_item.delete()
         success = general_utils.success('deleted_successfully')
         return Response(success)

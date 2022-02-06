@@ -1,11 +1,11 @@
 from django.contrib import admin
-from .models import Product, ProductImage, Feature, FeatureAttribute, Review
+from .models import Product, ProductImage, Feature, FeatureOption, Review
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
-class FeatureAttributeInline(NestedStackedInline):
-    model = FeatureAttribute
+class FeatureOptionInline(NestedStackedInline):
+    model = FeatureOption
     can_delete = True
-    verbose_name_plural = 'Attributes'
+    verbose_name_plural = 'Options'
     fk_name = 'feature'
 
 
@@ -15,7 +15,7 @@ class FeatureInline(NestedStackedInline):
     can_delete = True
     verbose_name_plural = 'Features'
     fk_name = 'product'
-    inlines = [FeatureAttributeInline]
+    inlines = [FeatureOptionInline]
 
 
 class ReviewConfig(admin.ModelAdmin):
@@ -34,5 +34,5 @@ class ProductConfig(NestedModelAdmin):
 admin.site.register(Review, ReviewConfig)
 admin.site.register(Product, ProductConfig)
 admin.site.register(Feature)
-admin.site.register(FeatureAttribute)
+admin.site.register(FeatureOption)
 admin.site.register(ProductImage)

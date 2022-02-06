@@ -9,19 +9,19 @@ from django.db import transaction
 
 from users.api.serializers import UserBasicInfoSerializer
 from users.models import User
-from products.models import Product, ProductImage, Review, Feature, FeatureAttribute
+from products.models import Product, ProductImage, Review, Feature, FeatureOption
 from categories.api.serializers import BrandSerializer, CategorySerializer
 
-class FeatureAttributeSerializer(serializers.ModelSerializer):
+class FeatureOptionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = FeatureAttribute
+        model = FeatureOption
         fields = '__all__'
 
 class FeatureSerializer(serializers.ModelSerializer):
-    attributes = FeatureAttributeSerializer(many=True, read_only=True)
+    options = FeatureOptionSerializer(many=True, read_only=True)
     class Meta:
         model = Feature
-        fields = ('id', 'name', 'attributes')
+        fields = ('id', 'name', 'options')
 
 class ProductImageSerializer(serializers.ModelSerializer):
     class Meta:

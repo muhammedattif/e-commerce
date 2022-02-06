@@ -4,7 +4,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.db import transaction
 import src.utils as general_utils
-from products.models import Product, ProductImage, Feature, FeatureAttribute
+from products.models import Product, ProductImage, Feature, FeatureOption
 from vendor.models import Stock
 import products.utils as utils
 from .serializers import *
@@ -21,7 +21,7 @@ from rest_framework import filters
 
 class ProductFilter(ListAPIView):
     permission_classes = ()
-    queryset = Product.objects.select_related('category', 'brand', 'vendor').prefetch_related('features__attributes', 'category__childs', 'images', 'reviews').all()
+    queryset = Product.objects.select_related('category', 'brand', 'vendor').prefetch_related('features__options', 'category__childs', 'images', 'reviews').all()
     serializer_class = ProductsSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name', 'description']
@@ -55,25 +55,25 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
 
         images_obj = []
         features_obj = []
-        attributes_obj = []
+        options_obj = []
 
         for image in product_images:
             product_image_instance = ProductImage(product=product, image=image)
             images_obj.append(product_image_instance)
 
         for feature in features:
-            attributes = feature.pop('attributes')
+            options = feature.pop('options')
             feature_instance = Feature(product=product, **feature)
 
-            for attribute in attributes:
-                attribute_instance = FeatureAttribute(feature=feature_instance, **attribute)
-                attributes_obj.append(attribute_instance)
+            for option in options:
+                option_instance = FeatureOption(feature=feature_instance, **option)
+                options_obj.append(option_instance)
 
             features_obj.append(feature_instance)
 
         ProductImage.objects.bulk_create(images_obj)
         Feature.objects.bulk_create(features_obj)
-        FeatureAttribute.objects.bulk_create(attributes_obj)
+        FeatureOption.objects.bulk_create(options_obj)
         serializer = ProductsSerializer(product)
 
         return Response(serializer.data, status=status.HTTP_201_CREATED)
@@ -82,7 +82,7 @@ class ProductDetail(APIView):
     permission_classes = ()
 
     def get(self, request, id):
-        product, found, error = utils.get_product(id, select_related=['category', 'vendor'], prefetch_related=['features__attributes', 'images', 'reviews', 'category__products__reviews'])
+        product, found, error = utils.get_product(id, select_related=['category', 'vendor'], prefetch_related=['features__options', 'images', 'reviews', 'category__products__reviews'])
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
@@ -142,11 +142,11 @@ class ProductAvailability(APIView):
 
     def post(self, request, id):
 
-        if 'attributes' not in request.data:
+        if 'options' not in request.data:
             return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
 
-        attributes = request.data['attributes']
-        attributes_len = len(attributes)
+        options = request.data['options']
+        options_len = len(options)
 
         quantity = 1
         if 'quantity' in request.data:
@@ -159,12 +159,12 @@ class ProductAvailability(APIView):
 
         try:
             stock = Stock.objects.annotate(
-                                            total_attributes=Count('attributes'),
-                                            matching_attributes=Count('attributes', filter=Q(attributes__in=attributes))
+                                            total_options=Count('options'),
+                                            matching_options=Count('options', filter=Q(options__in=options))
                                         ).filter(
                                             product__id=id,
-                                            matching_attributes=attributes_len,
-                                            total_attributes=attributes_len
+                                            matching_options=options_len,
+                                            total_options=options_len
                                         ).first()
             if not stock:
                 return Response(general_utils.error('product_not_available'), status=status.HTTP_404_NOT_FOUND)
@@ -172,7 +172,7 @@ class ProductAvailability(APIView):
             if not stock.quantity or stock.quantity < quantity:
                 return Response(general_utils.error('out_of_stock'), status=status.HTTP_404_NOT_FOUND)
 
-            features_additional_price = FeatureAttribute.objects.filter(id__in=attributes).aggregate(sum=Sum(F('additional_price')))['sum']
+            features_additional_price = FeatureOption.objects.filter(id__in=options).aggregate(sum=Sum(F('additional_price')))['sum']
             new_price = (features_additional_price + product.price.amount)* quantity
 
             response = general_utils.success('product_available', new_price=new_price, stock_id=stock.id)

@@ -2,7 +2,7 @@ from rest_framework.generics import ListAPIView, ListCreateAPIView
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
-from products.models import Product, Review, Feature, FeatureAttribute
+from products.models import Product, Review, Feature, FeatureOption
 from products.api.serializers import ReviewSerializer, VendorProductsSerializer, VendorReviewsSerializer, FeatureSerializer
 from payment.api.serializers import VendorOrderItemSerializer
 from payment.models import OrderItem
@@ -19,7 +19,7 @@ class VendorProductList(ListAPIView):
 
     def get_queryset(self):
         queryset = Product.objects.select_related('category', 'brand', 'vendor'
-        ).prefetch_related('features__attributes', 'category__childs', 'images', 'reviews'
+        ).prefetch_related('features__options', 'category__childs', 'images', 'reviews'
         ).filter(vendor=self.request.user)
         return queryset
 
@@ -56,7 +56,7 @@ class StockCreateListRetriveAPIView(APIView):
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
-        product_stock = Stock.objects.prefetch_related('attributes').filter(product=product)
+        product_stock = Stock.objects.prefetch_related('options').filter(product=product)
         serializer = StockSerializer(product_stock, many=True)
         return Response(serializer.data)
 
@@ -82,18 +82,18 @@ class StockCreateListRetriveAPIView(APIView):
         if not request.user.is_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
-        if 'attributes' not in request.data:
+        if 'options' not in request.data:
             return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
 
-        attributes = request.data['attributes']
+        options = request.data['options']
         product, found, error = product_utils.get_product(id, select_related=['category', 'vendor'])
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
         # Check if attribues belongs to this product
-        product_attributes = FeatureAttribute.objects.filter(feature__product=product).values_list('id', flat=True)
-        if attributes:
-            match = set(attributes).issubset(product_attributes)
+        product_options = FeatureOption.objects.filter(feature__product=product).values_list('id', flat=True)
+        if options:
+            match = set(options).issubset(product_options)
             if not match:
                 return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
 
@@ -101,7 +101,7 @@ class StockCreateListRetriveAPIView(APIView):
 
         try:
             stock = Stock.objects.create(product=product)
-            stock.attributes.set(attributes)
+            stock.options.set(options)
         except IntegrityError as e:
             error = general_utils.error('stock_already_exists', error_description=str(e))
             return Response(error)
@@ -121,6 +121,6 @@ class ProductStockFeaturesAPIView(APIView):
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
-        features = Feature.objects.prefetch_related('attributes').annotate(attributes_num=Count('attributes')).filter(product=product, attributes_num__gt=1)
+        features = Feature.objects.prefetch_related('options').annotate(options_num=Count('options')).filter(product=product, options_num__gt=1)
         serializer = FeatureSerializer(features, many=True)
         return Response(serializer.data)

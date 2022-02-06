@@ -15,7 +15,7 @@ UserModel = settings.AUTH_USER_MODEL
 #         # calculate original price including Taxes
 #         original_price = instance.product.price
 #         discount = instance.product.discount
-#         additional_price = instance.stock.attributes.aggregate(sum=Sum('additional_price'))['sum']
+#         additional_price = instance.stock.options.aggregate(sum=Sum('additional_price'))['sum']
 #         final_price = ((original_price.amount-discount.amount) + additional_price * (1 + Decimal(settings.TAX_AMOUNT)/Decimal(100.0))) * instance.quantity
 #         instance.final_price = final_price
 #

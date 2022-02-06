@@ -84,8 +84,8 @@ class Feature(models.Model):
     def __str__(self):
         return f'{self.product.name}-{self.name}'
 
-class FeatureAttribute(models.Model):
-    feature = models.ForeignKey(Feature, on_delete=models.CASCADE, related_name='attributes')
+class FeatureOption(models.Model):
+    feature = models.ForeignKey(Feature, on_delete=models.CASCADE, related_name='options')
     name = models.CharField(max_length=100)
     additional_price = MoneyField(max_digits=14, decimal_places=4, default=0,
     validators=[

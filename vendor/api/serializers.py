@@ -1,12 +1,12 @@
 from rest_framework import serializers
 from vendor.models import Stock
-from products.api.serializers import FeatureAttributeSerializer
+from products.api.serializers import FeatureOptionSerializer
 from django.db.models import Sum, F
 from products.api.serializers import ProductsSerializer
 from products.models import Product
 
 class StockSerializer(serializers.ModelSerializer):
-    attributes = FeatureAttributeSerializer(many=True, read_only=True)
+    options = FeatureOptionSerializer(many=True, read_only=True)
     class Meta:
         model = Stock
         fields = '__all__'
