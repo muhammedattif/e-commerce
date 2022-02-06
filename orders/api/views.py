@@ -30,7 +30,7 @@ class OrderRetriveUpdateView(APIView):
 
 class OrderCancellingView(APIView):
 
-    def get(self, request, id):
+    def put(self, request, id):
         user = request.user
         try:
             order = Order.objects.prefetch_related('items', 'items__stock__product').get(id=id, user=user)
