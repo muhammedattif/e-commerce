@@ -171,8 +171,12 @@ DJOSER = {
     'LOGOUT_ON_PASSWORD_CHANGE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
     'SERIALIZERS': {
-        
+
     },
+    'EMAIL': {
+        'password_reset': 'users.email.PasswordResetEmail',
+        'activation': 'users.email.ActivationEmail'
+    }
 }
 
 # Internationalization
@@ -230,3 +234,5 @@ DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
     }
 }
 DJANGO_REST_MULTITOKENAUTH_RESET_TOKEN_EXPIRY_TIME = 1 # Time in hours
+
+FRONT_END_DOMAIN = 'front-end-domain.com'
