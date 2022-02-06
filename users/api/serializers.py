@@ -12,10 +12,10 @@ User = get_user_model()
 
 class SignUpSerializer(serializers.ModelSerializer):
 
-    password2 = serializers.CharField(style={'input_type': 'password'}, write_only=True)
+    re_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
     class Meta:
         model = User
-        fields = ['email', 'username', 'password', 'password2']
+        fields = ['email', 'username', 'first_name', 'last_name', 'avatar', 'password', 're_password', 'is_vendor']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -29,19 +29,20 @@ class SignUpSerializer(serializers.ModelSerializer):
         user = User(
             email=self.validated_data['email'],
             username=self.validated_data['username'],
+            first_name=self.validated_data['first_name'],
+            last_name=self.validated_data['last_name'],
+            avatar=self.validated_data['avatar'],
             is_vendor=is_vendor
         )
 
         password = self.validated_data['password']
-        password2 = self.validated_data['password2']
+        re_password = self.validated_data['re_password']
 
-        if password != password2:
+        if password != re_password:
             raise serializers.ValidationError({'password':'Password does not match.'})
         user.set_password(password)
         user.save()
         return user
-
-
 
 
 

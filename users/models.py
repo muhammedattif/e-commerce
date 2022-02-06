@@ -12,24 +12,22 @@ def get_image_filename(instance, filename):
 # this class is for overriding default users manager of django user model
 class MyAccountManager(BaseUserManager):
 
-    def create_user(self, email, username, password=None, is_staff=False, is_superuser=False, is_vendor=False):
+    def create_user(self, email, username, first_name, last_name, avatar, location, password=None, is_staff=False, is_superuser=False):
         if not email:
             raise ValueError('User must have an email address')
         if not username:
             raise VlaueError('User must have a username')
 
-        is_active = True
-        # if is_vendor:
-        #     is_active = False
-
         user = self.model(
                         email=self.normalize_email(email),
                         username=username,
-                        is_active=is_active,
+                        first_name=first_name,
+                        last_name=last_name,
+                        avatar=avatar,
+                        location=location,
                         is_staff=is_staff,
-                        is_superuser=is_superuser,
-                        is_vendor=is_vendor
-        )
+                        is_superuser=is_superuser
+                        )
 
 
         user.set_password(password)
@@ -66,7 +64,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = MyAccountManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'avatar', 'location']
 
     # resize profile image before saving
     def save(self, created=None, *args, **kwargs):
