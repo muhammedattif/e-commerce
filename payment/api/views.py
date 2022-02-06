@@ -6,7 +6,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 from django.db.models import Sum
 import src.utils as general_utils
-from payment.models import Cart, CartItem, Order, OrderItem
+from payment.models import Cart, CartItem
+from orders.models import Order, OrderItem
 import payment.utils as utils
 from .serializers import *
 from djmoney.money import Money

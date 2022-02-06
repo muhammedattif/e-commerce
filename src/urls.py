@@ -68,6 +68,11 @@ urlpatterns = [
     path('categories/', include('categories.urls', 'categories')),
     # Categories APIs
     path('api/categories/', include('categories.api.urls', 'categories_api')),
+
+    # Orders
+    path('orders/', include('orders.urls', 'orders')),
+    # Orders APIs
+    path('api/orders/', include('orders.api.urls', 'orders_api')),
 ]
 
 if settings.DEBUG:

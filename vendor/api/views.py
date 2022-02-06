@@ -4,8 +4,8 @@ from rest_framework import status
 from rest_framework.response import Response
 from products.models import Product, Review, Feature, FeatureOption
 from products.api.serializers import ReviewSerializer, VendorProductsSerializer, VendorReviewsSerializer, FeatureSerializer
-from payment.api.serializers import VendorOrderItemSerializer
-from payment.models import OrderItem
+from orders.api.serializers import VendorOrderItemSerializer
+from orders.models import OrderItem
 from products import utils as product_utils
 import src.utils as general_utils
 from .serializers import StockSerializer, StockItemSerializer
