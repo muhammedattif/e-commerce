@@ -30,13 +30,13 @@ class Order(models.Model):
 
 
     def cancel(self):
-        self.is_cancelled = True
-
-        order_items = self.items.all()
-        for item in order_items:
-            item.stock.quantity = F('quantity') + item.quantity
-            item.stock.save()
-        self.save()
+        if not self.is_cancelled:
+            self.is_cancelled = True
+            order_items = self.items.all()
+            for item in order_items:
+                item.stock.quantity = F('quantity') + item.quantity
+                item.stock.save()
+            self.save()
 
 class OrderItem(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)

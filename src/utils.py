@@ -37,7 +37,8 @@ error_messages = {
     'not_updated': "Not Updated.",
     'wrong_old_password': "Old password is wrong.",
     'invalid_url': 'Invalid URL.',
-    'invalid_quantity_value': 'Product quantity not available right now.'
+    'invalid_quantity_value': 'Product quantity not available right now.',
+    'obj_not_found': "Object not found!"
 }
 
 success_messages = {

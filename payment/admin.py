@@ -7,7 +7,7 @@ class CartConfig(admin.ModelAdmin):
     list_filter = ('user', 'sub_total', 'total', 'discount', 'taxes')
     list_display = ('user', 'sub_total', 'total', 'discount', 'taxes')
 
-    readonly_fields=('user', 'sub_total', 'total', 'discount', 'taxes')
+    readonly_fields=('sub_total', 'total', 'discount', 'taxes')
 
     def get_queryset(self, request):
         queryset = super(CartConfig, self).get_queryset(request)

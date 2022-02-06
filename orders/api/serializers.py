@@ -20,3 +20,13 @@ class OrderSerializer(serializers.ModelSerializer):
 
     def get_discount_percentage(self, order):
         return (order.discount/order.sub_total)*100
+
+
+class OrderDetailSerializer(serializers.ModelSerializer):
+    discount_percentage = serializers.SerializerMethodField('get_discount_percentage')
+    class Meta:
+        model = Order
+        fields = '__all__'
+
+    def get_discount_percentage(self, order):
+        return (order.discount/order.sub_total)*100
