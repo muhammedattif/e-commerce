@@ -54,7 +54,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_name = models.CharField(max_length=30)
     username = models.CharField(max_length=30, unique=True, validators=[UnicodeUsernameValidator()])
     avatar = models.ImageField(upload_to=get_image_filename, null=True, blank=True)
-    location = models.CharField(blank=True, max_length=100)
+    location = models.CharField(max_length=100)
     date_joined = models.DateTimeField(verbose_name="Date Joined", auto_now_add=True)
     last_login = models.DateTimeField(verbose_name="Last Login", auto_now=True)
     is_active = models.BooleanField('Active status', default=True)
