@@ -19,6 +19,7 @@ class Product(models.Model):
     vendor = models.ForeignKey(User, on_delete=models.CASCADE)
     name = models.TextField()
     description = RichTextUploadingField(blank=True)
+    cover = models.ImageField(upload_to=get_image_filename)
     price = MoneyField(max_digits=14, decimal_places=4, default=1,
         validators=[
         MinMoneyValidator(1)
