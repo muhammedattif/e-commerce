@@ -1,5 +1,6 @@
 from django.urls import path, include
-from .views import SignIn, SignUp, Profile, BaseAddressListCreateView, ChangePasswordView, ResetPasswordConfirmView
+from .views import SignIn, SignUp, Profile, BaseAddressListCreateView, ChangePasswordView, ResetPasswordConfirmView, FavoriteListAddView, FavoriteDestroyView
+
 app_name = 'users'
 
 urlpatterns = [
@@ -8,6 +9,9 @@ urlpatterns = [
     path('signup', SignUp.as_view(), name="singup"),
     path('profile/', Profile.as_view(), name="profile"),
     path('profile/addresses/', BaseAddressListCreateView.as_view(), name="addresses"),
+
+    path('favorites/', FavoriteListAddView.as_view(), name="favorite-list-add"),
+    path('favorites/<int:id>/', FavoriteDestroyView.as_view(), name="remove-from-favorite"),
 
     # Change Password
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),

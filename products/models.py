@@ -9,6 +9,9 @@ from djmoney.models.fields import MoneyField
 from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 from django.db.utils import IntegrityError
+from django.contrib.auth import get_user_model
+
+User = get_user_model()
 
 def get_image_filename(instance, filename):
     id = instance.id
@@ -123,6 +126,14 @@ class Review(models.Model):
 
     class Meta:
         unique_together = ['user', 'product']
+
+    def __str__(self):
+        return self.user.username
+
+
+class Favorite(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='favorite')
+    products = models.ManyToManyField(Product)
 
     def __str__(self):
         return self.user.username

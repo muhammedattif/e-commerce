@@ -13,12 +13,14 @@ from django.core.exceptions import ValidationError
 from .serializers import ChangePasswordSerializer
 from users.models import User
 import src.utils as general_utils
-
+from products.models import Favorite
+from products.api.serializers import ProductsSerializer
 from django_rest_passwordreset.views import ResetPasswordConfirm
 from django_rest_passwordreset.models import ResetPasswordToken
 from django_rest_passwordreset.signals import pre_password_reset, post_password_reset
 from django.contrib.auth.password_validation import validate_password, get_password_validators
 from django.conf import settings
+import products.utils as product_utils
 
 class SignIn(APIView):
     throttle_classes = ()
@@ -189,4 +191,48 @@ class ResetPasswordConfirmView(ResetPasswordConfirm):
         ResetPasswordToken.objects.filter(user=reset_password_token.user).delete()
 
         success = general_utils.success('password_reset_successfully')
+        return Response(success)
+
+
+class FavoriteListAddView(APIView):
+
+    def get(self, request):
+        favorites = request.user.favorite.products.all()
+        serializer = ProductsSerializer(favorites, many=True)
+        return Response(serializer.data)
+
+    def post(self, request):
+
+        product_id = request.data['product_id']
+
+        filter_kwargs = {
+        'id': product_id
+        }
+        product, found, error = product_utils.get_product(filter_kwargs)
+        if not found:
+            return Response(error, status=status.HTTP_404_NOT_FOUND)
+
+        favorites = request.user.favorite.products
+        favorites.add(product)
+
+        success = general_utils.success('updated_successfully')
+        return Response(success)
+
+
+class FavoriteDestroyView(APIView):
+
+    def delete(self, request, id):
+
+        filter_kwargs = {
+        'id': id
+        }
+
+        product, found, error = product_utils.get_product(filter_kwargs)
+        if not found:
+            return Response(error, status=status.HTTP_404_NOT_FOUND)
+
+        favorites = request.user.favorite.products
+        favorites.remove(product)
+
+        success = general_utils.success('updated_successfully')
         return Response(success)

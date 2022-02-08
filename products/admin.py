@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, ProductImage, Feature, FeatureOption, Review
+from .models import Product, ProductImage, Feature, FeatureOption, Review, Favorite
 from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
 class FeatureOptionInline(NestedStackedInline):
@@ -36,3 +36,4 @@ admin.site.register(Product, ProductConfig)
 admin.site.register(Feature)
 admin.site.register(FeatureOption)
 admin.site.register(ProductImage)
+admin.site.register(Favorite)
