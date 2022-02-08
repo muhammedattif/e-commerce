@@ -26,7 +26,6 @@ class Cart(models.Model):
     def calculate_sub_total(self):
         sub_total = self.items.aggregate(sum=Sum(F('product__price') * F('quantity')))['sum']
         additional_price = self.items.aggregate(sum=Sum(F('stock__options__additional_price') * F('quantity')))['sum']
-        print(additional_price)
         self.sub_total = sub_total + additional_price
         return self.sub_total
 

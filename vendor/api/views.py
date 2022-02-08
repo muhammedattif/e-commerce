@@ -5,10 +5,10 @@ from rest_framework.response import Response
 from products.models import Product, Review, Feature, FeatureOption
 from products.api.serializers import ReviewSerializer, VendorProductsSerializer, VendorProductSerializer, VendorReviewsSerializer, FeatureSerializer
 from orders.api.serializers import VendorOrderItemSerializer
-from orders.models import OrderItem
+from orders.models import Order, OrderItem
 from products import utils as product_utils
 import src.utils as general_utils
-from .serializers import StockSerializer, StockItemSerializer
+from .serializers import StockSerializer, StockItemSerializer, ReportSerializer
 from vendor.models import Stock
 from django.db.models import Sum, F, Count, Q
 from django.db.utils import IntegrityError
@@ -147,4 +147,37 @@ class ProductStockFeaturesAPIView(APIView):
 
         features = Feature.objects.prefetch_related('options').annotate(options_num=Count('options')).filter(product=product, options_num__gt=1)
         serializer = FeatureSerializer(features, many=True)
+        return Response(serializer.data)
+
+class Report(APIView):
+
+    def get(self, request):
+
+        if not request.user.is_vendor:
+            return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
+
+        orders = Order.objects.select_related('user').filter(items__product__vendor=request.user)
+        number_of_orders = orders.count()
+        orders_amount = orders.aggregate(sum=Sum(F('total')))['sum']
+        number_of_items_sold = orders.aggregate(count=Count(F('items')))['count']
+        received_payments = orders.filter(is_paid=True).aggregate(sum=Sum(F('total')))['sum']
+        if not received_payments:
+            received_payments = 0
+
+        sales = result = orders.values('creation__date').annotate(total=Sum('total')).order_by('creation__date')
+
+        order_days = orders.values_list('creation__date', flat=True).distinct().count()
+        daily_sales = orders_amount/order_days
+
+        data = {
+        'number_of_orders': number_of_orders,
+        'orders_amount': orders_amount,
+        'number_of_items_sold': number_of_items_sold,
+        'received_payments': received_payments,
+        'sales': sales,
+        'daily_sales': daily_sales,
+
+        }
+
+        serializer = ReportSerializer(data, many=False)
         return Response(serializer.data)

@@ -19,3 +19,21 @@ class StockItemSerializer(serializers.ModelSerializer):
 
     def get_quantity(self, product):
         return product.quantity
+
+
+class SalesSerializer(serializers.Serializer):
+    day = serializers.SerializerMethodField('get_day')
+    total = serializers.DecimalField(max_digits=14, decimal_places=4)
+
+    def get_day(self, obj):
+        print(obj)
+        return obj['creation__date']
+
+
+class ReportSerializer(serializers.Serializer):
+    sales = SalesSerializer(many=True, read_only=True)
+    number_of_orders = serializers.IntegerField()
+    orders_amount = serializers.DecimalField(max_digits=14, decimal_places=4)
+    number_of_items_sold = serializers.IntegerField()
+    received_payments = serializers.DecimalField(max_digits=14, decimal_places=4)
+    daily_sales = serializers.DecimalField(max_digits=14, decimal_places=4)
