@@ -19,7 +19,7 @@ def get_image_filename(instance, filename):
 
 # Product Model
 class Product(models.Model):
-    vendor = models.ForeignKey(User, on_delete=models.CASCADE)
+    vendor = models.ForeignKey(User, on_delete=models.RESTRICT)
     name = models.TextField()
     description = RichTextUploadingField(blank=True)
     cover = models.ImageField(upload_to=get_image_filename)
@@ -32,7 +32,7 @@ class Product(models.Model):
         validators=[
         MinMoneyValidator(0)
         ], default_currency='SAR')
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="products")
+    category = models.ForeignKey(Category, on_delete=models.SET_DEFAULT, default=1, related_name="products")
     brand = models.ForeignKey(Brand, on_delete=models.SET_DEFAULT, default=1, related_name="products")
     creation = models.DateTimeField(blank=True, auto_now_add=True)
 

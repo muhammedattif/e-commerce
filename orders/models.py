@@ -9,8 +9,8 @@ from users.models import Address
 UserModel = settings.AUTH_USER_MODEL
 
 class Order(models.Model):
-    user = models.ForeignKey(UserModel, on_delete=models.CASCADE, related_name='orders')
-    address =models.ForeignKey(Address, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserModel, on_delete=models.RESTRICT, related_name='orders')
+    address =models.ForeignKey(Address, on_delete=models.RESTRICT)
     total = MoneyField(max_digits=14, decimal_places=4, default_currency='SAR')
     sub_total = MoneyField(max_digits=14, decimal_places=4, default_currency='SAR')
     discount = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR')
@@ -39,9 +39,9 @@ class Order(models.Model):
             self.save()
 
 class OrderItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items')
-    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.RESTRICT)
+    order = models.ForeignKey(Order, on_delete=models.RESTRICT, related_name='items')
+    stock = models.ForeignKey(Stock, on_delete=models.RESTRICT)
     creation = models.DateTimeField(auto_now_add=True)
     quantity = models.PositiveIntegerField(blank=False, default=1, validators=[
     MinValueValidator(1)

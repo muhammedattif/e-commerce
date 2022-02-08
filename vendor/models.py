@@ -8,7 +8,7 @@ from django.db.utils import IntegrityError
 import src.utils as general_utils
 
 class Stock(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='stock')
+    product = models.ForeignKey(Product, on_delete=models.RESTRICT, related_name='stock')
     options = models.ManyToManyField(FeatureOption)
     quantity = models.PositiveSmallIntegerField(default=1,
         validators=[
