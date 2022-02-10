@@ -25,7 +25,7 @@ class ReviewConfig(admin.ModelAdmin):
     list_display = ('user', 'product', 'rate', 'likes', 'dislikes', 'creation')
 
 class ProductConfig(NestedModelAdmin):
-    model = Review
+    model = Product
 
     list_filter = ('vendor', 'name', 'price', 'discount', 'creation')
     list_display = ('vendor', 'name', 'price', 'discount', 'creation')
