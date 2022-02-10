@@ -43,13 +43,23 @@ class OrderConfig(admin.ModelAdmin):
     'is_paid',
     'is_cancelled'
     )
-
-    readonly_fields=('user', 'address', 'sub_total', 'total', 'discount', 'taxes')
+    search_fields = ('items__product__name', 'items__product__description')
+    readonly_fields = ('user', 'address', 'sub_total', 'total', 'discount', 'taxes')
+    list_select_related = ('user', 'address__user')
+    ordering = ['creation']
 
     def get_queryset(self, request):
         queryset = super(OrderConfig, self).get_queryset(request)
         queryset = queryset.select_related('user', 'address').prefetch_related('address__user')
         return queryset
-        
+
+class OrderItemConfig(admin.ModelAdmin):
+    model = OrderItem
+
+    list_display = ('product', 'order', 'stock', 'quantity')
+    fields = ('product', 'order', 'stock', 'quantity')
+
+    search_fields = ('product__name', 'product__description')
+
 admin.site.register(Order, OrderConfig)
-admin.site.register(OrderItem)
+admin.site.register(OrderItem, OrderItemConfig)
