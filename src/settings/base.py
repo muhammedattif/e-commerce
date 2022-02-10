@@ -92,27 +92,6 @@ MIDDLEWARE = [
     'django.middleware.common.CommonMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS = True
-CORS_ALLOW_METHODS = [
-'DELETE',
-'GET',
-'OPTIONS',
-'PATCH',
-'POST',
-'PUT',
-]
-
-CORS_ALLOW_HEADERS = [
-'accept',
-'accept-encoding',
-'authorization',
-'content-type',
-'dnt',
-'origin',
-'user-agent',
-'x-csrftoken',
-'x-requested-with',
-]
 
 ROOT_URLCONF = 'src.urls'
 
@@ -153,7 +132,7 @@ REST_FRAMEWORK = {
 SIMPLE_JWT = {
    'AUTH_HEADER_TYPES': ('JWT',),
    'ACCESS_TOKEN_LIFETIME': timedelta(hours=1),
-    'REFRESH_TOKEN_LIFETIME': timedelta(hours=5),
+   'REFRESH_TOKEN_LIFETIME': timedelta(hours=5),
 }
 
 DJOSER = {
@@ -171,7 +150,6 @@ DJOSER = {
     'LOGOUT_ON_PASSWORD_CHANGE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
     'SERIALIZERS': {
-
     },
     'EMAIL': {
         'password_reset': 'users.email.PasswordResetEmail',
@@ -213,17 +191,17 @@ PROFILE_IMAGES_URL = 'profile_images'
 CKEDITOR_UPLOAD_PATH = "products_uploads/"
 
 
-TAX_AMOUNT = 14.0
+TAX_AMOUNT = 14.0 # Number in percentage
 
 #Email BACKEND
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_USE_TLS = True
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'emtyazadvisor.smtp@gmail.com'
-EMAIL_HOST_PASSWORD = 'jciqufezvdxbeyoa'
-EMAIL_TIMEOUT = 20 #Time in seconds
+EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
+EMAIL_TIMEOUT = env('EMAIL_TIMEOUT') #Time in seconds
 
 # REST_FRAMEWORK Rest Password
 DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
@@ -235,4 +213,4 @@ DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
 }
 DJANGO_REST_MULTITOKENAUTH_RESET_TOKEN_EXPIRY_TIME = 1 # Time in hours
 
-FRONT_END_DOMAIN = 'front-end-domain.com'
+FRONT_END_DOMAIN = env('FRONT_END_DOMAIN')
