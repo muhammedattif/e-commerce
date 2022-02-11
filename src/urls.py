@@ -73,6 +73,11 @@ urlpatterns = [
     path('orders/', include('orders.urls', 'orders')),
     # Orders APIs
     path('api/orders/', include('orders.api.urls', 'orders_api')),
+
+    # Gifts
+    path('gifts/', include('gifts.urls', 'gifts')),
+    # Gifts APIs
+    path('api/gifts/', include('gifts.api.urls', 'gifts-apis')),
 ]
 
 if settings.DEBUG:
