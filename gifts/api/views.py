@@ -12,25 +12,27 @@ class GiftList(APIView):
         conditions = [{'operator': '>', 'price': 1000}, {'operator': '<', 'price': 2000}]
         config = PromoCodeConfig(
                 discount_type='fixed',
-                amount=100,
+                amount=10000,
                 users=request.user,
+                all_users=True,
                 brands=brands,
-                categories=categories,
-                conditions=conditions
+                categories=categories
             )
-        print(config)
-        promo_code = PromoCode.objects.create_promo_code(config)
-        # # promo_code = PromoCode.objects.prefetch_related('rules__usage__parent_rule','rules__allowed_users__users').filter(rules__allowed_users__users__in=[request.user]).first()
-        # print(promo_code.is_active)
-        # print(promo_code.is_expired)
-        # print(promo_code.is_valid)
-        # print(promo_code.is_limit_reached)
-        # print(promo_code.is_eligible_for_user(request.user))
-        # print(promo_code.is_user_limit_reached(request.user))
-        # # print(promo_code.redeem(request.user))
-        # print(promo_code.rules)
-        # print(promo_code.rules.allowed_categories.all())
-        # print(promo_code.rules.allowed_brands.all())
-        # print(promo_code.check_conditions())
+        promo_code = PromoCode.objects.create_promo_code(config=config)
+        print(promo_code.is_valid(user=request.user))
+        # promo_code = PromoCode.objects.prefetch_related('rules__usage__parent_rule','rules__allowed_users__users').filter(rules__allowed_users__users__in=[request.user]).first()
+        print(promo_code.is_active)
+        print(promo_code.is_expired)
+        print(promo_code.is_valid)
+        print(promo_code.is_limit_reached)
+        print(promo_code.is_eligible_for_user(request.user))
+        print(promo_code.is_user_limit_reached(request.user))
+        print(promo_code.redeem(request.user))
+        print(promo_code.rules)
+        print(promo_code.rules.allowed_categories.all())
+        print(promo_code.rules.allowed_brands.all())
+        print(promo_code.check_conditions())
+        print(PromoCode.objects.expired())
+        print(PromoCode.objects.owner(user=request.user))
 
         return Response({'1':1})

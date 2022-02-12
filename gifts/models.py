@@ -4,6 +4,7 @@ from django.contrib.contenttypes.fields import GenericForeignKey
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.auth import get_user_model
 from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
+from django.core.validators import MaxValueValidator, MinValueValidator
 from djmoney.models.fields import MoneyField
 from django.db import IntegrityError
 import datetime
@@ -75,12 +76,13 @@ class PromoCodeManager(models.Manager):
             raise (f'Promo Code with -> {code} is already exists')
 
         # Create Allowed Users Rule
-        if not isinstance(users, list):
-            users = [users]
-
         allowed_users = AllowedUsersRule(all_users=all_users)
         allowed_users.save()
-        allowed_users.users.add(*users)
+
+        if users:
+            if not isinstance(users, list):
+                users = [users]
+            allowed_users.users.add(*users)
 
         # Create Usage Rule
         usage_rule = UsageRule(
@@ -110,25 +112,33 @@ class PromoCodeManager(models.Manager):
         promo_code_rule.allowed_brands.add(*brands)
 
         # Create Conditions Rule
-        conditions_list = []
-        for condition in conditions:
-            conditions_list.append(ConditionRule(operator=condition['operator'], price=condition['price']))
+        if conditions:
+            conditions_list = []
+            for condition in conditions:
+                conditions_list.append(ConditionRule(operator=condition['operator'], price=condition['price']))
 
-        condition_rules = ConditionRule.objects.bulk_create(conditions_list)
+            condition_rules = ConditionRule.objects.bulk_create(conditions_list)
 
-        # Set Conditions
-        promo_code_rule.conditions.add(*condition_rules)
+            # Set Conditions
+            promo_code_rule.conditions.add(*condition_rules)
 
         return promo_code
 
-    def create_promo_codes(self, quantity, type, value, valid_until=None, prefix=""):
+    @transaction.atomic
+    def create_promo_codes(self, quantity, config: PromoCodeConfig):
+        """
+        Do not use it a lot it HITS the DB with multiple queries
+        """
         promo_codes = []
         for i in range(quantity):
-            promo_code.append(self.create_coupon(type, value, None, valid_until, prefix))
+            promo_codes.append(self.create_promo_code(config))
         return promo_codes
 
     def expired(self):
         return self.filter(rules__validity__valid_until__lt=timezone.now())
+
+    def owner(self, user):
+        return self.filter(rules__allowed_users__users__in=[user])
 
 
 class PromoCode(models.Model):
@@ -166,6 +176,10 @@ class PromoCode(models.Model):
         return self.rules.validity.activate
 
     @property
+    def deactivate(self):
+        return self.rules.validity.deactivate
+
+    @property
     def is_started(self):
         return self.rules.validity.is_started
 
@@ -173,27 +187,29 @@ class PromoCode(models.Model):
     def is_expired(self):
         return self.rules.validity.is_expired
 
-    @property
-    def is_valid(self):
-        return self.rules.validity.is_valid
+    def is_valid(self, user):
+        return self.rules.validity.is_valid and not self.is_limit_reached and self.is_eligible_for_user(user) and not self.is_user_limit_reached(user)
 
     @property
     def is_limit_reached(self):
         return self.rules.usage.is_limit_reached
 
-    def is_user_limit_reached(self, user):
-        return self.rules.usage.is_user_limit_reached(user)
-
     def is_eligible_for_user(self, user):
         return self.rules.allowed_users.is_eligible_for_user(user)
+
+    def is_user_limit_reached(self, user):
+        return self.rules.usage.is_user_limit_reached(user)
 
     @property
     def get_eligible_users(self):
         return self.rules.allowed_users.get_eligible_users
 
+    def get_discounted_value(self, order_amount):
+        return self.discount_object.get_discounted_value(order_amount)
+
     def redeem(self, user):
 
-        if self.is_limit_reached() or self.is_user_limit_reached(user):
+        if self.is_limit_reached or self.is_user_limit_reached(user):
             return False
 
         redemption = Redemption.objects.create(user=user, promo_code=self)
@@ -201,6 +217,10 @@ class PromoCode(models.Model):
             return False
 
         self.rules.usage.increase_number_of_uses()
+        return True
+
+    def rollback(self):
+        self.rules.usage.decrease_number_of_uses()
         return True
 
     def check_conditions(self, order_amount=0):
@@ -237,6 +257,9 @@ class ConditionRule(models.Model):
         MinMoneyValidator(1)
         ], default_currency='SAR')
 
+    def __str__(self):
+        return "Condition Rule Nº{0}".format(self.id)
+
 
 class AllowedUsersRule(models.Model):
     users = models.ManyToManyField(User, verbose_name="Users", blank=True)
@@ -269,7 +292,7 @@ class UsageRule(models.Model):
         verbose_name_plural = "Usage Rules"
 
     def __str__(self):
-        return "UsageRule Nº{0}".format(self.id)
+        return "Usage Rule Nº{0}".format(self.id)
 
     @property
     def is_limit_reached(self):
@@ -301,7 +324,7 @@ class ValidityRule(models.Model):
         verbose_name_plural = "Validity Rules"
 
     def __str__(self):
-        return "ValidityRule Nº{0}".format(self.id)
+        return "Validity Rule Nº{0}".format(self.id)
 
     @property
     def is_started(self):
@@ -318,6 +341,12 @@ class ValidityRule(models.Model):
     @property
     def activate(self):
         self.is_active = True
+        self.save()
+        return True
+
+    @property
+    def deactivate(self):
+        self.is_active = False
         self.save()
         return True
 
@@ -340,18 +369,41 @@ class FixedDiscount(models.Model):
         ], default_currency='SAR')
 
     def __str__(self):
-        return str(self.id)
+        return f"{self.amount} Discount"
 
+    def get_discounted_value(self, order_amount):
+        new_price = order_amount - self.amount.amount
+        return new_price if new_price >= 0.0 else 0.0
 
 class PercentageDiscount(models.Model):
-    percentage = models.PositiveIntegerField()
+    percentage = models.PositiveIntegerField(validators=[
+    MinValueValidator(1),
+    MaxValueValidator(100)
+    ])
     max_discount_limit = MoneyField(max_digits=14, decimal_places=4, default=100,
         validators=[
         MinMoneyValidator(1)
-        ], default_currency='SAR')
+        ], default_currency='SAR',help_text = "If set to 0, it means Unlimited.")
 
     def __str__(self):
-        return str(self.id)
+        return f"{self.percentage}% Discount"
+
+    def get_discounted_value(self, order_amount):
+
+        amount_after_discount = order_amount - (order_amount * self.percentage / 100)
+
+        # In case limit is equal to 0 then it means unlimited
+        if not self.max_discount_limit.amount:
+            return amount_after_discount
+
+        # price amount that the user saves after applying the discount
+        amount_saved = order_amount - amount_after_discount
+
+        if amount_saved > self.max_discount_limit.amount > 0:
+            new_price = order_amount - self.max_discount_limit.amount
+        else:
+            new_price = order_amount - amount_saved
+        return new_price
 
 class Redemption(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='redemptions')
@@ -359,4 +411,11 @@ class Redemption(models.Model):
     redeemed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return f'{self.promo_code.code}-{self.user.username}'
+
+    @transaction.atomic
+    def delete(self):
+        print(1)
+        self.promo_code.rollback()
+        print(2)
+        super(Redemption, self).delete()
