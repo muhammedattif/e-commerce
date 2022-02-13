@@ -26,10 +26,16 @@ $ python manage.py collectstatic
 $ python manage.py createsuperuser
 ```
 
+# --- Configurations
+
 **Note**: This project is built using PostgreSQL Database
 
-**Note**: All DB congfigurations are in .env file
+**Note**: All DB configurations are in .env file
 
-**Note**: All Mailing server congfigurations are in .env file
+**Note**: All Mailing server configurations are in .env file
 
-**Note**: You have to set ENVIRONMENT='production' when going live.
+**Note**: You have to set environment='production' when going live.
+
+**Note**: You have to set FRONT_END_DOMAIN='https://front-domain.com' when going live.
+
+**Note**: You have to set ALLOWED_HOST='back-domain.com' without http:// when going live.
