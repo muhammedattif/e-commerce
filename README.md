@@ -27,6 +27,9 @@ $ python manage.py createsuperuser
 ```
 
 **Note**: This project is built using PostgreSQL Database
+
 **Note**: All DB congfigurations are in .env file
+
 **Note**: All Mailing server congfigurations are in .env file
+
 **Note**: You have to set ENVIRONMENT='production' when going live.
