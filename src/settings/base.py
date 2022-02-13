@@ -201,10 +201,10 @@ TAX_AMOUNT = 14.0 # Number in percentage
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = env('EMAIL_HOST')
 EMAIL_USE_TLS = True
-EMAIL_PORT = env('EMAIL_PORT')
+EMAIL_PORT = int(env('EMAIL_PORT'))
 EMAIL_HOST_USER = env('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD')
-EMAIL_TIMEOUT = env('EMAIL_TIMEOUT') #Time in seconds
+EMAIL_TIMEOUT = int(env('EMAIL_TIMEOUT')) #Time in seconds
 
 # REST_FRAMEWORK Rest Password
 DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
