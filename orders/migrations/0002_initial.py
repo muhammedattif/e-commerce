@@ -9,20 +9,20 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('payment', '0001_initial'),
+        ('orders', '0001_initial'),
         ('vendor', '0001_initial'),
         ('products', '0001_initial'),
     ]
 
     operations = [
         migrations.AddField(
-            model_name='cartitem',
+            model_name='orderitem',
             name='product',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='products.product'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.RESTRICT, to='products.product'),
         ),
         migrations.AddField(
-            model_name='cartitem',
+            model_name='orderitem',
             name='stock',
-            field=models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, to='vendor.stock'),
+            field=models.ForeignKey(on_delete=django.db.models.deletion.RESTRICT, to='vendor.stock'),
         ),
     ]

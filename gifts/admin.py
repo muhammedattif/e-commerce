@@ -9,13 +9,13 @@ class RedemptionConfig(admin.ModelAdmin):
     model = Redemption
     actions = [rollback_and_delete_selected_redemptions]
 
-
-admin.site.register(PromoCode, PromoCodeConfig)
-admin.site.register(PromoCodeRule)
-admin.site.register(AllowedUsersRule)
-admin.site.register(UsageRule)
-admin.site.register(ValidityRule)
-admin.site.register(ConditionRule)
-admin.site.register(Redemption, RedemptionConfig)
-admin.site.register(FixedDiscount)
-admin.site.register(PercentageDiscount)
+#
+# admin.site.register(PromoCode, PromoCodeConfig)
+# admin.site.register(PromoCodeRule)
+# admin.site.register(AllowedUsersRule)
+# admin.site.register(UsageRule)
+# admin.site.register(ValidityRule)
+# admin.site.register(ConditionRule)
+# admin.site.register(Redemption, RedemptionConfig)
+# admin.site.register(FixedDiscount)
+# admin.site.register(PercentageDiscount)

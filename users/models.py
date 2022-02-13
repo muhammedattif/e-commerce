@@ -12,7 +12,7 @@ def get_image_filename(instance, filename):
 # this class is for overriding default users manager of django user model
 class MyAccountManager(BaseUserManager):
 
-    def create_user(self, email, username, first_name, last_name, avatar, location, password=None, is_staff=False, is_superuser=False):
+    def create_user(self, email, username, first_name, last_name, avatar, location, password=None, is_staff=False, is_superuser=False, is_vendor=False):
         if not email:
             raise ValueError('User must have an email address')
         if not username:
@@ -26,7 +26,8 @@ class MyAccountManager(BaseUserManager):
                         avatar=avatar,
                         location=location,
                         is_staff=is_staff,
-                        is_superuser=is_superuser
+                        is_superuser=is_superuser,
+                        is_vendor=is_vendor
                         )
 
 
@@ -35,11 +36,15 @@ class MyAccountManager(BaseUserManager):
         return user
 
     @transaction.atomic
-    def create_superuser(self, email, username, password):
+    def create_superuser(self, email, username, password, first_name, last_name, avatar, location):
         user = self.create_user(
             email=self.normalize_email(email),
             password=password,
             username=username,
+            first_name=first_name,
+            last_name=last_name,
+            avatar=avatar,
+            location=location,
             is_staff = True,
             is_vendor = True,
             is_superuser = True
