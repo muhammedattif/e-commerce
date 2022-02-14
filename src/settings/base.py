@@ -52,7 +52,6 @@ INSTALLED_APPS = [
     'django_rest_passwordreset',
     'rest_framework.authtoken',
     'djoser',
-    'nested_inline',
     # for scanning from virus
     'django_clamd',
     # this is for CRONJOBS

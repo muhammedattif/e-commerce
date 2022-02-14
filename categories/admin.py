@@ -1,6 +1,6 @@
 from django.contrib import admin
 from .models import Category, Brand
-from nested_inline.admin import NestedStackedInline, NestedModelAdmin
+# from nested_inline.admin import NestedStackedInline, NestedModelAdmin
 
 
 class CategoryConfig(admin.ModelAdmin):
