@@ -60,6 +60,7 @@ CORS_ALLOW_HEADERS = [
 'x-requested-with',
 ]
 
-SECURE_SSL_REDIRECT = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_SECURE = True
+# Uncomment these Configurations if you do not a use a web server 
+# SECURE_SSL_REDIRECT = True
+# SESSION_COOKIE_SECURE = True
+# CSRF_COOKIE_SECURE = True

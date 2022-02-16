@@ -39,7 +39,6 @@ ALLOWED_HOSTS = [env('ALLOWED_HOST')]
 # Application definition
 
 INSTALLED_APPS = [
-    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -58,6 +57,7 @@ INSTALLED_APPS = [
     'django_crontab',
     # CORS
     'corsheaders',
+    'django_admin_arabic',
 
     #PLUGINS
     'ckeditor',
@@ -99,7 +99,7 @@ ROOT_URLCONF = 'src.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['templates'],
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -158,19 +158,6 @@ DJOSER = {
     }
 }
 
-# Internationalization
-# https://docs.djangoproject.com/en/3.2/topics/i18n/
-
-LANGUAGE_CODE = 'en'
-
-TIME_ZONE = 'Africa/Cairo'
-
-USE_I18N = True
-
-USE_L10N = True
-
-USE_TZ = True
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -216,3 +203,31 @@ DJANGO_REST_PASSWORDRESET_TOKEN_CONFIG = {
 DJANGO_REST_MULTITOKENAUTH_RESET_TOKEN_EXPIRY_TIME = 1 # Time in hours
 
 FRONT_END_DOMAIN = env('FRONT_END_DOMAIN')
+
+# Django Admin
+SITE_INDEX_TITLE = 'Mahawer'
+SITE_TITLE = 'Administration'
+SITE_HEADER = 'Mahawer'
+
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/3.2/topics/i18n/
+
+# Internationalization
+# https://docs.djangoproject.com/en/3.0/topics/i18n/
+from django.utils.translation import gettext_lazy as _
+LANGUAGE_CODE = 'en'
+TIME_ZONE = 'Africa/Cairo'
+USE_I18N = True
+USE_L10N = True
+USE_TZ = True
+
+LANGUAGES = (
+    ('ar', _('Arabic')),
+    ('en', _('English')),
+)
+
+LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
+
+DEFAULT_LANGUAGE = 1

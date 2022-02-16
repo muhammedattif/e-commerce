@@ -36,7 +36,6 @@ schema_view = get_schema_view(
 )
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('ckeditor/', include('ckeditor_uploader.urls')),
 
     # Swagger UI
@@ -78,6 +77,9 @@ urlpatterns = [
     path('gifts/', include('gifts.urls', 'gifts')),
     # Gifts APIs
     path('api/gifts/', include('gifts.api.urls', 'gifts-apis')),
+
+    # Django Arabic URLS
+    path('django-arabic', include('django_admin_arabic.urls')),
 ]
 
 if settings.DEBUG:
@@ -87,3 +89,12 @@ if settings.DEBUG:
         # This for debugging
         path('__debug__/', include(debug_toolbar.urls)),
     ]
+
+from django.conf.urls.i18n import i18n_patterns
+
+urlpatterns += i18n_patterns(
+    path('admin/', admin.site.urls),
+    path('i18n/', include('django.conf.urls.i18n')),
+    # If no prefix is given, use the default language
+    prefix_default_language=True
+)
