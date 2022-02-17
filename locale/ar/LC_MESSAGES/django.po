@@ -88,7 +88,7 @@ msgstr "منتج"
 
 #: products/models.py:46
 msgid "Products"
-msgstr "منتجات"
+msgstr "المنتجات"
 
 #: products/models.py:97
 msgid "Feature"
