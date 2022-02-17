@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-16 23:19+0200\n"
+"POT-Creation-Date: 2022-02-17 19:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,44 +19,140 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: django_admin_arabic/templates/admin/base.html:24
+#: categories/models.py:11
+msgid "Brand"
+msgstr "علامه تجاريه"
+
+#: categories/models.py:12
+msgid "Brands"
+msgstr "العلامات التجاريه"
+
+#: categories/models.py:34
+msgid "Category"
+msgstr "فئه"
+
+#: categories/models.py:35
+msgid "Categories"
+msgstr "الفئات"
+
+#: django_admin_arabic/templates/admin/base_site.html:25
 #: templates/admin/base_site.html:24
 msgid "Documentation"
 msgstr ""
 
-#: django_admin_arabic/templates/admin/base.html:28
+#: django_admin_arabic/templates/admin/base_site.html:29
 #: templates/admin/base_site.html:28
 msgid "Change password"
 msgstr "تغيير كلمة السر"
 
-#: django_admin_arabic/templates/admin/base.html:30
+#: django_admin_arabic/templates/admin/base_site.html:31
 #: templates/admin/base_site.html:30
 msgid "Log out"
 msgstr "خروج"
 
-#: products/models.py:42
+#: orders/models.py:30
+msgid "Order"
+msgstr "طلب"
+
+#: orders/models.py:31
+msgid "Orders"
+msgstr "الطلبات"
+
+#: orders/models.py:56
+msgid "Order Item"
+msgstr "منتج مطلوب"
+
+#: orders/models.py:57
+msgid "Order Items"
+msgstr "المنتجات المطلوبة"
+
+#: payment/models.py:25
+msgid "Cart"
+msgstr "عربة شراء"
+
+#: payment/models.py:26
+msgid "Carts"
+msgstr "عربات الشراء"
+
+#: payment/models.py:77
+msgid "Cart Item"
+msgstr "المنتجات التي توجد في عربات الشراء"
+
+#: payment/models.py:78
+msgid "Cart Items"
+msgstr "المنتجات التي توجد في عربات الشراء"
+
+#: products/models.py:45
 msgid "Product"
 msgstr "منتج"
 
-#: products/models.py:43
+#: products/models.py:46
 msgid "Products"
 msgstr "منتجات"
 
-#: products/models.py:142
+#: products/models.py:97
+msgid "Feature"
+msgstr "مواصفات المنتجات"
+
+#: products/models.py:98
+msgid "Features"
+msgstr "مواصفات المنتجات"
+
+#: products/models.py:113
+msgid "Feature Option"
+msgstr "أنواع مواصفات المنتجات"
+
+#: products/models.py:114
+msgid "Feature Options"
+msgstr "أنواع مواصفات المنتجات"
+
+#: products/models.py:126
+msgid "Product Image"
+msgstr "صورة منتج"
+
+#: products/models.py:127
+msgid "Product Images"
+msgstr "صور المنتجات"
+
+#: products/models.py:148
+msgid "Review"
+msgstr "تقييم"
+
+#: products/models.py:149
+msgid "Reviews"
+msgstr "التقييمات"
+
+#: products/models.py:160
 msgid "Favorite"
 msgstr "المنتجات المفضلة"
 
-#: products/models.py:143
+#: products/models.py:161
 msgid "Favorites"
 msgstr "المنتجات المفضلة"
 
-#: src/settings/base.py:227
+#: src/settings/base.py:228
 msgid "Arabic"
 msgstr "عربي"
 
-#: src/settings/base.py:228
+#: src/settings/base.py:229
 msgid "English"
 msgstr "إنجليزي"
+
+#: users/models.py:76
+msgid "User"
+msgstr "عميل"
+
+#: users/models.py:77
+msgid "Users"
+msgstr "العملاء"
+
+#: users/models.py:92
+msgid "Address"
+msgstr "عنوان"
+
+#: users/models.py:93
+msgid "Addresses"
+msgstr "العناوين"
 
 #: users/templates/users/activation_email_form.html:4
 #, python-format
@@ -108,3 +204,11 @@ msgstr ""
 #: users/templates/users/reset_password_email_form.txt:12
 msgid "Have a great day!\n"
 msgstr ""
+
+#: vendor/models.py:21
+msgid "Stock"
+msgstr "مخزن"
+
+#: vendor/models.py:22
+msgid "Stocks"
+msgstr "المخازن"

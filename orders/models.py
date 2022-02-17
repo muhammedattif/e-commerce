@@ -7,6 +7,7 @@ from products.models import Product
 from vendor.models import Stock
 from users.models import Address
 UserModel = settings.AUTH_USER_MODEL
+from django.utils.translation import gettext_lazy as _
 
 class Order(models.Model):
     user = models.ForeignKey(UserModel, on_delete=models.RESTRICT, related_name='orders')
@@ -24,6 +25,10 @@ class Order(models.Model):
     is_arrived = models.BooleanField(default=False)
     is_paid = models.BooleanField(default=False)
     is_cancelled = models.BooleanField(default=False)
+
+    class Meta:
+        verbose_name = _('Order')
+        verbose_name_plural = _('Orders')
 
     def __str__(self):
           return self.user.username
@@ -46,6 +51,10 @@ class OrderItem(models.Model):
     quantity = models.PositiveIntegerField(blank=False, default=1, validators=[
     MinValueValidator(1)
     ])
+
+    class Meta:
+        verbose_name = _('Order Item')
+        verbose_name_plural = _('Order Items')
 
     def __str__(self):
         return f'{self.product.name}-{self.stock.id}'

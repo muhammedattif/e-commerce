@@ -6,6 +6,7 @@ from products.models import Product, FeatureOption
 from django.core.validators import MinValueValidator
 from django.db.utils import IntegrityError
 import src.utils as general_utils
+from django.utils.translation import gettext_lazy as _
 
 class Stock(models.Model):
     product = models.ForeignKey(Product, on_delete=models.RESTRICT, related_name='stock')
@@ -17,6 +18,9 @@ class Stock(models.Model):
 
     class Meta:
         ordering = ['-id']
+        verbose_name = _('Stock')
+        verbose_name_plural = _('Stocks')
+
 
     def __str__(self):
           return self.product.name

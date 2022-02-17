@@ -94,6 +94,8 @@ class Feature(models.Model):
 
     class Meta:
         unique_together = ('product', 'name')
+        verbose_name = _('Feature')
+        verbose_name_plural = _('Features')
 
     def __str__(self):
         return f'{self.product.name}-{self.name}'
@@ -108,6 +110,8 @@ class FeatureOption(models.Model):
 
     class Meta:
         unique_together = ('feature', 'name')
+        verbose_name = _('Feature Option')
+        verbose_name_plural = _('Feature Options')
 
     def __str__(self):
         return f'{self.feature.product}-{self.feature.name}-{self.name}'
@@ -117,6 +121,10 @@ class FeatureOption(models.Model):
 class ProductImage(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
     image = models.FileField(upload_to=get_image_filename)
+
+    class Meta:
+        verbose_name = _('Product Image')
+        verbose_name_plural = _('Product Images')
 
     def __str__(self):
         return self.product.name
@@ -137,6 +145,8 @@ class Review(models.Model):
 
     class Meta:
         unique_together = ['user', 'product']
+        verbose_name = _('Review')
+        verbose_name_plural = _('Reviews')
 
     def __str__(self):
         return self.user.username

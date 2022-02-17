@@ -4,6 +4,7 @@ from django.contrib.auth.validators import UnicodeUsernameValidator
 from django.conf import settings
 from django.db.models import F
 from django.db import transaction
+from django.utils.translation import gettext_lazy as _
 
 def get_image_filename(instance, filename):
     id = instance.id
@@ -71,6 +72,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'avatar', 'location']
 
+    class Meta(AbstractBaseUser.Meta, PermissionsMixin.Meta):
+        verbose_name = _('User')
+        verbose_name_plural = _('Users')
+
     # resize profile image before saving
     def save(self, created=None, *args, **kwargs):
         super().save(*args, **kwargs)
@@ -84,7 +89,8 @@ class Address(models.Model):
     state = models.CharField(max_length=50)
 
     class Meta:
-        verbose_name_plural = "addresses"
+        verbose_name = _('Address')
+        verbose_name_plural = _('Addresses')
 
     def __str__(self):
         return f'{self.user.username}->{self.city}'

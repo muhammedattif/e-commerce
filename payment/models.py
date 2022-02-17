@@ -8,6 +8,7 @@ from vendor.models import Stock
 from users.models import Address
 from django.db.models import Sum, F
 from decimal import Decimal
+from django.utils.translation import gettext_lazy as _
 
 UserModel = settings.AUTH_USER_MODEL
 
@@ -19,6 +20,10 @@ class Cart(models.Model):
     discount = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True, default_currency='SAR')
     taxes = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR')
     creation = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name = _('Cart')
+        verbose_name_plural = _('Carts')
 
     def __str__(self):
         return f'{self.user.username}'
@@ -67,6 +72,10 @@ class CartItem(models.Model):
     quantity = models.PositiveIntegerField(blank=False, default=1, validators=[
     MinValueValidator(1)
     ])
+
+    class Meta:
+        verbose_name = _('Cart Item')
+        verbose_name_plural = _('Cart Items')
 
     def __str__(self):
         return f'{self.product.name}-{self.stock.id}'

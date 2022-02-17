@@ -39,6 +39,7 @@ ALLOWED_HOSTS = [env('ALLOWED_HOST')]
 # Application definition
 
 INSTALLED_APPS = [
+    'django_admin_arabic',
     'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -58,7 +59,6 @@ INSTALLED_APPS = [
     'django_crontab',
     # CORS
     'corsheaders',
-    'django_admin_arabic',
 
     #PLUGINS
     'ckeditor',

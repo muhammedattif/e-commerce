@@ -1,10 +1,15 @@
 from django.db import models
 from mptt.models import MPTTModel, TreeForeignKey
+from django.utils.translation import gettext_lazy as _
 
 
 class Brand(models.Model):
     name = models.CharField(max_length=100)
     icon = models.ImageField(upload_to="brands/", blank=True)
+
+    class Meta:
+        verbose_name = _('Brand')
+        verbose_name_plural = _('Brands')
 
     def __str__(self):
           return self.name
@@ -26,7 +31,8 @@ class Category(MPTTModel):
 
     class Meta:
         unique_together = ('name', 'parent')
-        verbose_name_plural = 'Categories'
+        verbose_name = _('Category')
+        verbose_name_plural = _('Categories')
 
     def __str__(self):
         full_path = [self.name]
