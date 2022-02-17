@@ -1,3 +1,5 @@
+import string
+import random
 
 def error(error_key, **extra_data):
 
@@ -18,6 +20,14 @@ def success(success_key, **extra_data):
         **extra_data
     }
     return success_dict
+
+def generate_random_string(CODE_LENGTH=6, segmented=False):
+    code = "".join(random.choice(string.ascii_uppercase+string.digits) for i in range(CODE_LENGTH))
+    if segmented:
+        code = SEGMENT_SEPARATOR.join([code[i:i + SEGMENT_LENGTH] for i in range(0, len(code), SEGMENT_LENGTH)])
+        return code
+    else:
+        return code
 
 error_messages = {
     'not_vendor': 'You must be a Vendor to add Products.',

@@ -11,7 +11,6 @@ import datetime
 from datetime import date
 import random
 from categories.models import Category, Brand
-import random
 from .utils import Condition, PromoCodeConfig
 from django.utils import timezone
 from .settings import (

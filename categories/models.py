@@ -4,6 +4,7 @@ from mptt.models import MPTTModel, TreeForeignKey
 
 class Brand(models.Model):
     name = models.CharField(max_length=100)
+    icon = models.ImageField(upload_to="brands/", blank=True)
 
     def __str__(self):
           return self.name

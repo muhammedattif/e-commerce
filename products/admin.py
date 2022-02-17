@@ -18,13 +18,9 @@ from .models import Product, ProductImage, Feature, FeatureOption, Review, Favor
 #     fk_name = 'product'
 #     inlines = [FeatureOptionInline]
 
-from django.utils.translation import gettext_lazy as _
 
 class ReviewConfig(admin.ModelAdmin):
     model = Review
-    verbose_name = _('Review')
-    verbose_name = _('Review')
-    verbose_name_plural = _('Reviews')
 
     list_filter = ('user', 'product', 'rate', 'likes', 'dislikes', 'creation')
     list_display = ('user', 'product', 'rate', 'likes', 'dislikes', 'creation')

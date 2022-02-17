@@ -10,6 +10,8 @@ from django.db.models.signals import m2m_changed
 from django.dispatch import receiver
 from django.db.utils import IntegrityError
 from django.contrib.auth import get_user_model
+from django.utils.translation import gettext_lazy as _
+import src.utils as general_utils
 
 User = get_user_model()
 
@@ -35,12 +37,21 @@ class Product(models.Model):
     category = models.ForeignKey(Category, on_delete=models.SET_DEFAULT, default=1, related_name="products")
     brand = models.ForeignKey(Brand, on_delete=models.SET_DEFAULT, default=1, related_name="products")
     creation = models.DateTimeField(blank=True, auto_now_add=True)
+    minimum_cart_quantity = models.PositiveIntegerField(default=1)
+    code = models.CharField(blank=True, max_length=100, default=general_utils.generate_random_string)
 
     class Meta:
         ordering = ('-creation',)
+        verbose_name = _('Product')
+        verbose_name_plural = _('Products')
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.code:
+            self.code = generate_random_string()
+        super(Product, self).save(*args, **kwargs)
 
     def get_rating(self):
         total_reviews = self.reviews.count()
@@ -134,6 +145,10 @@ class Review(models.Model):
 class Favorite(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='favorite')
     products = models.ManyToManyField(Product)
+
+    class Meta:
+        verbose_name = _('Favorite')
+        verbose_name_plural = _('Favorites')
 
     def __str__(self):
         return self.user.username
