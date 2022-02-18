@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-17 19:25+0200\n"
+"POT-Creation-Date: 2022-02-18 19:25+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -19,7 +19,16 @@ msgstr ""
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
 
-#: categories/models.py:11
+#: categories/models.py:7 categories/models.py:23 products/models.py:25
+#: products/models.py:93 products/models.py:105
+msgid "Name"
+msgstr "الأسم"
+
+#: categories/models.py:8
+msgid "Icon"
+msgstr "صورة"
+
+#: categories/models.py:11 products/models.py:38
 msgid "Brand"
 msgstr "علامه تجاريه"
 
@@ -27,11 +36,15 @@ msgstr "علامه تجاريه"
 msgid "Brands"
 msgstr "العلامات التجاريه"
 
-#: categories/models.py:34
+#: categories/models.py:30
+msgid "Parent"
+msgstr "الفئة الرئيسية"
+
+#: categories/models.py:35 products/models.py:37
 msgid "Category"
 msgstr "فئه"
 
-#: categories/models.py:35
+#: categories/models.py:36
 msgid "Categories"
 msgstr "الفئات"
 
@@ -50,13 +63,76 @@ msgstr "تغيير كلمة السر"
 msgid "Log out"
 msgstr "خروج"
 
-#: orders/models.py:30
+#: orders/models.py:13 payment/models.py:17 products/models.py:133
+#: products/models.py:156 users/models.py:76 users/models.py:85
+msgid "User"
+msgstr "عميل"
+
+#: orders/models.py:14 users/models.py:92
+msgid "Address"
+msgstr "عنوان"
+
+#: orders/models.py:15 payment/models.py:18
+msgid "Total"
+msgstr "المبلغ الكلي"
+
+#: orders/models.py:16
+msgid "Sub Total"
+msgstr "المبلغ الفرعي"
+
+#: orders/models.py:17 payment/models.py:20 products/models.py:36
+msgid "Discount"
+msgstr "الخصم"
+
+#: orders/models.py:18 payment/models.py:21
+msgid "Taxes"
+msgstr "الضرائب"
+
+#: orders/models.py:22
+msgid "Is Processed"
+msgstr ""
+
+#: orders/models.py:23
+msgid "Is Shipped"
+msgstr ""
+
+#: orders/models.py:24
+msgid "Is In Route"
+msgstr ""
+
+#: orders/models.py:25
+msgid "Is arrived"
+msgstr ""
+
+#: orders/models.py:26
+msgid "Is Paid"
+msgstr ""
+
+#: orders/models.py:27
+msgid "Is Cancelled"
+msgstr ""
+
+#: orders/models.py:30 orders/models.py:48
 msgid "Order"
 msgstr "طلب"
 
 #: orders/models.py:31
 msgid "Orders"
 msgstr "الطلبات"
+
+#: orders/models.py:47 payment/models.py:68 products/models.py:45
+#: products/models.py:92 products/models.py:122 products/models.py:134
+#: products/models.py:157 vendor/models.py:12
+msgid "Product"
+msgstr "منتج"
+
+#: orders/models.py:49 payment/models.py:70 vendor/models.py:21
+msgid "Stock"
+msgstr "مخزن"
+
+#: orders/models.py:53 payment/models.py:74 vendor/models.py:17
+msgid "Quantity"
+msgstr "الكمية"
 
 #: orders/models.py:56
 msgid "Order Item"
@@ -66,7 +142,11 @@ msgstr "منتج مطلوب"
 msgid "Order Items"
 msgstr "المنتجات المطلوبة"
 
-#: payment/models.py:25
+#: payment/models.py:19
+msgid "Sub total"
+msgstr "المبلغ الفرعي"
+
+#: payment/models.py:25 payment/models.py:69
 msgid "Cart"
 msgstr "عربة شراء"
 
@@ -82,21 +162,45 @@ msgstr "المنتجات التي توجد في عربات الشراء"
 msgid "Cart Items"
 msgstr "المنتجات التي توجد في عربات الشراء"
 
-#: products/models.py:45
-msgid "Product"
-msgstr "منتج"
+#: products/models.py:24
+msgid "Vendor"
+msgstr "البائع"
+
+#: products/models.py:26
+msgid "Description"
+msgstr "الوصف"
+
+#: products/models.py:27
+msgid "Cover"
+msgstr "صورة الغلاف"
+
+#: products/models.py:31
+msgid "Price"
+msgstr "السعر"
+
+#: products/models.py:40
+msgid "Minimun Cart Quantity"
+msgstr "اقل كميه مسموحة لإضافتة إلى العربة"
+
+#: products/models.py:41
+msgid "Code"
+msgstr "كود المنتج"
 
 #: products/models.py:46
 msgid "Products"
 msgstr "المنتجات"
 
-#: products/models.py:97
+#: products/models.py:97 products/models.py:104
 msgid "Feature"
 msgstr "مواصفات المنتجات"
 
 #: products/models.py:98
 msgid "Features"
 msgstr "مواصفات المنتجات"
+
+#: products/models.py:109
+msgid "Additional Price"
+msgstr "السعر الإضافي"
 
 #: products/models.py:113
 msgid "Feature Option"
@@ -106,6 +210,10 @@ msgstr "أنواع مواصفات المنتجات"
 msgid "Feature Options"
 msgstr "أنواع مواصفات المنتجات"
 
+#: products/models.py:123
+msgid "Image"
+msgstr "الصورة"
+
 #: products/models.py:126
 msgid "Product Image"
 msgstr "صورة منتج"
@@ -113,6 +221,22 @@ msgstr "صورة منتج"
 #: products/models.py:127
 msgid "Product Images"
 msgstr "صور المنتجات"
+
+#: products/models.py:135
+msgid "Body"
+msgstr "التعليق"
+
+#: products/models.py:140
+msgid "Rate"
+msgstr "التقييم"
+
+#: products/models.py:142
+msgid "Likes"
+msgstr "الإعجابات"
+
+#: products/models.py:143
+msgid "Dislikes"
+msgstr "لم يعجبهم"
 
 #: products/models.py:148
 msgid "Review"
@@ -138,17 +262,71 @@ msgstr "عربي"
 msgid "English"
 msgstr "إنجليزي"
 
-#: users/models.py:76
-msgid "User"
-msgstr "عميل"
+#: users/models.py:58
+msgid "Email"
+msgstr "البريد الإلكتروني"
+
+#: users/models.py:59
+msgid "First Name"
+msgstr "الإسم الأول"
+
+#: users/models.py:60
+msgid "Last Name"
+msgstr "الإسم الثاني"
+
+#: users/models.py:61
+#, fuzzy
+#| msgid "User"
+msgid "Username"
+msgstr "العميل"
+
+#: users/models.py:62
+msgid "Avatar"
+msgstr "صورة الملف الشخصي"
+
+#: users/models.py:63
+msgid "Location"
+msgstr "العنوان"
+
+#: users/models.py:64
+msgid "Date Joined"
+msgstr "تاريخ الإنضمام"
+
+#: users/models.py:65
+msgid "Last Login"
+msgstr "تاريخ أخر زياره"
+
+#: users/models.py:66
+msgid "Active Status"
+msgstr "نشط"
+
+#: users/models.py:67
+msgid "Staff Status"
+msgstr "موظف"
+
+#: users/models.py:68
+msgid "Vendor status"
+msgstr "بائع"
 
 #: users/models.py:77
 msgid "Users"
 msgstr "العملاء"
 
-#: users/models.py:92
-msgid "Address"
-msgstr "عنوان"
+#: users/models.py:86
+msgid "Locality"
+msgstr "المنطقة"
+
+#: users/models.py:87
+msgid "City"
+msgstr "المدينة"
+
+#: users/models.py:88
+msgid "Zipcode"
+msgstr "الرقم البريدي"
+
+#: users/models.py:89
+msgid "State"
+msgstr "الولاية"
 
 #: users/models.py:93
 msgid "Addresses"
@@ -205,9 +383,11 @@ msgstr ""
 msgid "Have a great day!\n"
 msgstr ""
 
-#: vendor/models.py:21
-msgid "Stock"
-msgstr "مخزن"
+#: vendor/models.py:13
+#, fuzzy
+#| msgid "Feature Option"
+msgid "Option"
+msgstr "أنواع مواصفات المنتجات"
 
 #: vendor/models.py:22
 msgid "Stocks"

@@ -9,12 +9,12 @@ import src.utils as general_utils
 from django.utils.translation import gettext_lazy as _
 
 class Stock(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.RESTRICT, related_name='stock')
-    options = models.ManyToManyField(FeatureOption)
+    product = models.ForeignKey(Product, verbose_name = _('Product'), on_delete=models.RESTRICT, related_name='stock')
+    options = models.ManyToManyField(FeatureOption, verbose_name = _('Option'))
     quantity = models.PositiveSmallIntegerField(default=1,
         validators=[
         MinValueValidator(0)
-        ])
+        ], verbose_name = _('Quantity'))
 
     class Meta:
         ordering = ['-id']

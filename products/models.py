@@ -21,24 +21,24 @@ def get_image_filename(instance, filename):
 
 # Product Model
 class Product(models.Model):
-    vendor = models.ForeignKey(User, on_delete=models.RESTRICT)
-    name = models.TextField()
-    description = RichTextUploadingField(blank=True)
-    cover = models.ImageField(upload_to=get_image_filename)
+    vendor = models.ForeignKey(User, verbose_name = _('Vendor'), on_delete=models.RESTRICT)
+    name = models.TextField(verbose_name = _('Name'))
+    description = RichTextUploadingField(blank=True, verbose_name = _('Description'))
+    cover = models.ImageField(upload_to=get_image_filename, verbose_name = _('Cover'))
     price = MoneyField(max_digits=14, decimal_places=4, default=1,
         validators=[
         MinMoneyValidator(1)
-        ], default_currency='SAR')
+        ], default_currency='SAR', verbose_name = _('Price'))
 
     discount = MoneyField(max_digits=14, decimal_places=4, default=0,
         validators=[
         MinMoneyValidator(0)
-        ], default_currency='SAR')
-    category = models.ForeignKey(Category, on_delete=models.SET_DEFAULT, default=1, related_name="products")
-    brand = models.ForeignKey(Brand, on_delete=models.SET_DEFAULT, default=1, related_name="products")
+        ], default_currency='SAR', verbose_name = _('Discount'))
+    category = models.ForeignKey(Category, verbose_name = _('Category'), on_delete=models.SET_DEFAULT, default=1, related_name="products")
+    brand = models.ForeignKey(Brand, verbose_name = _('Brand'), on_delete=models.SET_DEFAULT, default=1, related_name="products")
     creation = models.DateTimeField(blank=True, auto_now_add=True)
-    minimum_cart_quantity = models.PositiveIntegerField(default=1)
-    code = models.CharField(blank=True, max_length=100, default=general_utils.generate_random_string)
+    minimum_cart_quantity = models.PositiveIntegerField(default=1, verbose_name = _('Minimun Cart Quantity'))
+    code = models.CharField(blank=True, verbose_name = _('Code'), max_length=100, default=general_utils.generate_random_string)
 
     class Meta:
         ordering = ('-creation',)
@@ -89,8 +89,8 @@ class Product(models.Model):
         return self.category.products.all()[:5]
 
 class Feature(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='features')
-    name = models.CharField(max_length=100)
+    product = models.ForeignKey(Product, verbose_name = _('Product'), on_delete=models.CASCADE, related_name='features')
+    name = models.CharField(max_length=100, verbose_name = _('Name'))
 
     class Meta:
         unique_together = ('product', 'name')
@@ -101,12 +101,12 @@ class Feature(models.Model):
         return f'{self.product.name}-{self.name}'
 
 class FeatureOption(models.Model):
-    feature = models.ForeignKey(Feature, on_delete=models.CASCADE, related_name='options')
-    name = models.CharField(max_length=100)
+    feature = models.ForeignKey(Feature, verbose_name = _('Feature'), on_delete=models.CASCADE, related_name='options')
+    name = models.CharField(max_length=100, verbose_name = _('Name'))
     additional_price = MoneyField(max_digits=14, decimal_places=4, default=0,
     validators=[
     MinMoneyValidator(0)
-    ], default_currency='SAR')
+    ], default_currency='SAR', verbose_name = _('Additional Price'))
 
     class Meta:
         unique_together = ('feature', 'name')
@@ -119,8 +119,8 @@ class FeatureOption(models.Model):
 
 # Product Images Model
 class ProductImage(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='images')
-    image = models.FileField(upload_to=get_image_filename)
+    product = models.ForeignKey(Product, verbose_name = _('Product'), on_delete=models.CASCADE, related_name='images')
+    image = models.FileField(upload_to=get_image_filename, verbose_name = _('Image'))
 
     class Meta:
         verbose_name = _('Product Image')
@@ -130,17 +130,17 @@ class ProductImage(models.Model):
         return self.product.name
 
 class Review(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    product = models.ForeignKey(Product ,on_delete=models.CASCADE, related_name="reviews")
-    body = models.TextField(max_length=3000)
+    user = models.ForeignKey(User, verbose_name = _('User'), on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, verbose_name = _('Product'), on_delete=models.CASCADE, related_name="reviews")
+    body = models.TextField(max_length=3000, verbose_name = _('Body'))
     rate = models.PositiveSmallIntegerField(default=1,
         validators=[
         MaxValueValidator(5),
         MinValueValidator(1)
-        ])
+        ], verbose_name = _('Rate'))
 
-    likes= models.PositiveIntegerField(default=0)
-    dislikes = models.PositiveIntegerField(default=0)
+    likes= models.PositiveIntegerField(default=0, verbose_name = _('Likes'))
+    dislikes = models.PositiveIntegerField(default=0, verbose_name = _('Dislikes'))
     creation = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -153,8 +153,8 @@ class Review(models.Model):
 
 
 class Favorite(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='favorite')
-    products = models.ManyToManyField(Product)
+    user = models.OneToOneField(User, verbose_name = _('User'), on_delete=models.CASCADE, related_name='favorite')
+    products = models.ManyToManyField(Product, verbose_name = _('Product'))
 
     class Meta:
         verbose_name = _('Favorite')

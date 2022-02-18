@@ -55,17 +55,17 @@ class MyAccountManager(BaseUserManager):
 
 # Account Model
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(verbose_name='email', max_length=60, unique=True)
-    first_name = models.CharField(max_length=30)
-    last_name = models.CharField(max_length=30)
-    username = models.CharField(max_length=30, unique=True, validators=[UnicodeUsernameValidator()])
-    avatar = models.ImageField(upload_to=get_image_filename, null=True, blank=True)
-    location = models.CharField(max_length=100)
-    date_joined = models.DateTimeField(verbose_name="Date Joined", auto_now_add=True)
-    last_login = models.DateTimeField(verbose_name="Last Login", auto_now=True)
-    is_active = models.BooleanField('Active status', default=True)
-    is_staff = models.BooleanField('Staff status', default=False)
-    is_vendor = models.BooleanField('Vendor status', default=False)
+    email = models.EmailField(max_length=60, unique=True, verbose_name = _('Email'))
+    first_name = models.CharField(max_length=30, verbose_name = _('First Name'))
+    last_name = models.CharField(max_length=30, verbose_name = _('Last Name'))
+    username = models.CharField(max_length=30, unique=True, validators=[UnicodeUsernameValidator()], verbose_name = _('Username'))
+    avatar = models.ImageField(upload_to=get_image_filename, null=True, blank=True, verbose_name = _('Avatar'))
+    location = models.CharField(max_length=100, verbose_name = _('Location'))
+    date_joined = models.DateTimeField(auto_now_add=True, verbose_name = _('Date Joined'))
+    last_login = models.DateTimeField(auto_now=True, verbose_name = _('Last Login'))
+    is_active = models.BooleanField(default=True, verbose_name = _('Active Status'))
+    is_staff = models.BooleanField(default=False, verbose_name = _('Staff Status'))
+    is_vendor = models.BooleanField(default=False, verbose_name = _('Vendor status'))
 
     objects = MyAccountManager()
 
@@ -82,11 +82,11 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 
 class Address(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="addresses")
-    locality = models.CharField(max_length = 200)
-    city = models.CharField(max_length = 50)
-    zipcode = models.IntegerField()
-    state = models.CharField(max_length=50)
+    user = models.ForeignKey(User, verbose_name = _('User'), on_delete=models.CASCADE, related_name="addresses")
+    locality = models.CharField(max_length = 200, verbose_name = _('Locality'))
+    city = models.CharField(max_length=50, verbose_name = _('City'))
+    zipcode = models.IntegerField(verbose_name = _('Zipcode'))
+    state = models.CharField(max_length=50, verbose_name = _('State'))
 
     class Meta:
         verbose_name = _('Address')

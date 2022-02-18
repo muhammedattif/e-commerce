@@ -14,11 +14,11 @@ UserModel = settings.AUTH_USER_MODEL
 
 
 class Cart(models.Model):
-    user = models.OneToOneField(UserModel, on_delete=models.CASCADE, related_name='cart')
-    total = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True, default_currency='SAR')
-    sub_total = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True, default_currency='SAR')
-    discount = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True, default_currency='SAR')
-    taxes = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR')
+    user = models.OneToOneField(UserModel, verbose_name = _('User'), on_delete=models.CASCADE, related_name='cart')
+    total = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True, default_currency='SAR', verbose_name = _('Total'))
+    sub_total = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True, default_currency='SAR', verbose_name = _('Sub total'))
+    discount = MoneyField(max_digits=14, decimal_places=4, default=0, null=True, blank=True, default_currency='SAR', verbose_name = _('Discount'))
+    taxes = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR', verbose_name = _('Taxes'))
     creation = models.DateTimeField(auto_now_add=True)
 
     class Meta:
@@ -65,13 +65,13 @@ class Cart(models.Model):
 
 
 class CartItem(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
-    stock = models.ForeignKey(Stock, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, verbose_name = _('Product'), on_delete=models.CASCADE)
+    cart = models.ForeignKey(Cart, verbose_name = _('Cart'), on_delete=models.CASCADE, related_name='items')
+    stock = models.ForeignKey(Stock, verbose_name = _('Stock'), on_delete=models.CASCADE)
     creation = models.DateTimeField(auto_now_add=True)
     quantity = models.PositiveIntegerField(blank=False, default=1, validators=[
     MinValueValidator(1)
-    ])
+    ], verbose_name = _('Quantity'))
 
     class Meta:
         verbose_name = _('Cart Item')

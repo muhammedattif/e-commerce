@@ -4,8 +4,8 @@ from django.utils.translation import gettext_lazy as _
 
 
 class Brand(models.Model):
-    name = models.CharField(max_length=100)
-    icon = models.ImageField(upload_to="brands/", blank=True)
+    name = models.CharField(verbose_name = _('Name'), max_length=100)
+    icon = models.ImageField(upload_to="brands/", blank=True, verbose_name = _('Icon'))
 
     class Meta:
         verbose_name = _('Brand')
@@ -20,13 +20,14 @@ class Category(MPTTModel):
 
     # add initial values to db when migrating
 
-    name = models.CharField(max_length=100, unique=True)
+    name = models.CharField(max_length=100, unique=True, verbose_name = _('Name'))
     parent = TreeForeignKey(
         'self',
         blank=True,
         null=True,
         related_name='childs',
-        on_delete=models.SET_NULL
+        on_delete=models.SET_NULL,
+        verbose_name = _('Parent')
     )
 
     class Meta:
