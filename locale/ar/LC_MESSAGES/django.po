@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2022-02-18 19:25+0200\n"
+"POT-Creation-Date: 2022-02-19 15:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -80,7 +80,8 @@ msgstr "المبلغ الكلي"
 msgid "Sub Total"
 msgstr "المبلغ الفرعي"
 
-#: orders/models.py:17 payment/models.py:20 products/models.py:36
+#: orders/models.py:17 orders/models.py:51 payment/models.py:20
+#: products/models.py:36
 msgid "Discount"
 msgstr "الخصم"
 
@@ -130,15 +131,19 @@ msgstr "منتج"
 msgid "Stock"
 msgstr "مخزن"
 
-#: orders/models.py:53 payment/models.py:74 vendor/models.py:17
+#: orders/models.py:50 products/models.py:31
+msgid "Price"
+msgstr "السعر"
+
+#: orders/models.py:55 payment/models.py:74 vendor/models.py:17
 msgid "Quantity"
 msgstr "الكمية"
 
-#: orders/models.py:56
+#: orders/models.py:58
 msgid "Order Item"
 msgstr "منتج مطلوب"
 
-#: orders/models.py:57
+#: orders/models.py:59
 msgid "Order Items"
 msgstr "المنتجات المطلوبة"
 
@@ -173,10 +178,6 @@ msgstr "الوصف"
 #: products/models.py:27
 msgid "Cover"
 msgstr "صورة الغلاف"
-
-#: products/models.py:31
-msgid "Price"
-msgstr "السعر"
 
 #: products/models.py:40
 msgid "Minimun Cart Quantity"

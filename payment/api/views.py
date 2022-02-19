@@ -139,6 +139,8 @@ class CheckoutView(APIView):
             product=item.product,
             order=order,
             stock=item.stock,
+            price=item.product.price,
+            discount=item.product.discount,
             quantity=item.quantity
             )
             order_items_objs.append(order_item_instance)

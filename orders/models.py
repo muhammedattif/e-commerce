@@ -47,6 +47,8 @@ class OrderItem(models.Model):
     product = models.ForeignKey(Product, verbose_name = _('Product'), on_delete=models.RESTRICT)
     order = models.ForeignKey(Order, verbose_name = _('Order'), on_delete=models.RESTRICT, related_name='items')
     stock = models.ForeignKey(Stock, verbose_name = _('Stock'), on_delete=models.RESTRICT)
+    price = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR', verbose_name = _('Price'))
+    discount = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR', verbose_name = _('Discount'))
     creation = models.DateTimeField(auto_now_add=True)
     quantity = models.PositiveIntegerField(blank=False, default=1, validators=[
     MinValueValidator(1)
