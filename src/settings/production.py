@@ -60,7 +60,8 @@ CORS_ALLOW_HEADERS = [
 'x-requested-with',
 ]
 
-# Uncomment these Configurations if you do not a use a web server 
+# Uncomment these Configurations if you do not a use a web server
 # SECURE_SSL_REDIRECT = True
 # SESSION_COOKIE_SECURE = True
-# CSRF_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = False
+CSRF_TRUSTED_ORIGINS = [env("CSRF_TRUSTED_ORIGINS")]
