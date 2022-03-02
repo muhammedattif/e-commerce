@@ -100,10 +100,11 @@ class StockCreateListRetriveAPIView(APIView):
         if not request.user.is_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
-        if 'options' not in request.data:
+        if not ('options' and 'quantity') in request.data:
             return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
 
         options = request.data['options']
+        quantity = request.data['quantity']
         filter_kwargs = {
         'id': id,
         'vendor': request.user
@@ -120,7 +121,7 @@ class StockCreateListRetriveAPIView(APIView):
                 return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            stock = Stock.objects.create(product=product)
+            stock = Stock.objects.create(product=product, quantity=quantity)
             stock.options.set(options)
         except IntegrityError as e:
             error = general_utils.error('stock_already_exists', error_description=str(e))
@@ -156,18 +157,24 @@ class Report(APIView):
         if not request.user.is_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
-        orders = Order.objects.select_related('user').filter(items__product__vendor=request.user)
-        number_of_orders = orders.count()
-        orders_amount = orders.aggregate(sum=Sum(F('total')))['sum']
-        number_of_items_sold = orders.aggregate(count=Count(F('items')))['count']
-        received_payments = orders.filter(is_paid=True).aggregate(sum=Sum(F('total')))['sum']
+        number_of_orders = Order.objects.select_related('user').filter(items__product__vendor=request.user).count()
+        items = OrderItem.objects.filter(product__vendor=request.user)
+
+        orders_amount = items.aggregate(sum=Sum(F('price') - F('discount')))['sum']
+
+        received_payments = items.filter(order__is_paid=True).aggregate(sum=Sum(F('price') - F('discount')))['sum']
         if not received_payments:
             received_payments = 0
 
-        sales = result = orders.values('creation__date').annotate(total=Sum('total')).order_by('creation__date')
+        number_of_items_sold = items.count()
+        sales = items.values('creation').annotate(total=Sum(F('price') - F('discount'))).order_by('creation')
 
-        order_days = orders.values_list('creation__date', flat=True).distinct().count()
-        daily_sales = orders_amount/order_days
+        order_days = items.values_list('creation', flat=True).distinct().count()
+        if orders_amount:
+            daily_sales = orders_amount/order_days
+        else:
+            orders_amount = 0
+            daily_sales = 0
 
         data = {
         'number_of_orders': number_of_orders,
@@ -176,7 +183,6 @@ class Report(APIView):
         'received_payments': received_payments,
         'sales': sales,
         'daily_sales': daily_sales,
-
         }
 
         serializer = ReportSerializer(data, many=False)

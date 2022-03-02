@@ -26,8 +26,7 @@ class SalesSerializer(serializers.Serializer):
     total = serializers.DecimalField(max_digits=14, decimal_places=4)
 
     def get_day(self, obj):
-        print(obj)
-        return obj['creation__date']
+        return obj['creation']
 
 
 class ReportSerializer(serializers.Serializer):

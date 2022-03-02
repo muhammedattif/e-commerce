@@ -10,7 +10,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Stock(models.Model):
     product = models.ForeignKey(Product, verbose_name = _('Product'), on_delete=models.RESTRICT, related_name='stock')
-    options = models.ManyToManyField(FeatureOption, verbose_name = _('Option'))
+    options = models.ManyToManyField(FeatureOption, blank=True, verbose_name = _('Option'))
     quantity = models.PositiveSmallIntegerField(default=1,
         validators=[
         MinValueValidator(0)
@@ -48,6 +48,7 @@ def verify_uniqueness(sender, **kwargs):
 @receiver(pre_save, sender=Stock)
 def verify_uniqueness(sender, instance=None, **kwargs):
 
-    stock = Stock.objects.filter(product=instance.product, options=None)
-    if stock:
-        raise IntegrityError(general_utils.error_messages['stock_already_exists'])
+    if not instance.id:
+        stock = Stock.objects.filter(product=instance.product, options=None)
+        if stock:
+            raise IntegrityError(general_utils.error_messages['stock_already_exists'])

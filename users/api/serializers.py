@@ -161,3 +161,24 @@ class ChangePasswordSerializer(serializers.Serializer):
             raise serializers.ValidationError(errors)
 
         return super(RegisterUserSerializer, self).validate(data)
+
+
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.settings import api_settings
+
+class TokenObtainPairCustomSerializer(TokenObtainPairSerializer):
+    def validate(self, attrs):
+        data = super().validate(attrs)
+
+        refresh = self.get_token(self.user)
+
+        data['refresh'] = str(refresh)
+        data['access'] = str(refresh.access_token)
+        data['is_vendor'] = self.user.is_vendor
+
+
+        if api_settings.UPDATE_LAST_LOGIN:
+            update_last_login(None, self.user)
+
+        return data

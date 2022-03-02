@@ -1,5 +1,15 @@
 from django.urls import path, include
-from .views import SignIn, SignUp, Profile, BaseAddressListCreateView, ChangePasswordView, ResetPasswordConfirmView, FavoriteListAddView, FavoriteDestroyView
+from .views import (
+SignIn,
+SignUp,
+Profile,
+BaseAddressListCreateView,
+ChangePasswordView,
+ResetPasswordConfirmView,
+FavoriteListAddView,
+FavoriteDestroyView,
+TokenObtainPairCustomView
+)
 
 app_name = 'users'
 
@@ -22,4 +32,5 @@ urlpatterns = [
 
     path('auth/', include('djoser.urls')),
     path('auth/', include('djoser.urls.jwt')),
+    path('auth/jwt/custom/create/', TokenObtainPairCustomView.as_view()),
   ]

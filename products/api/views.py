@@ -45,13 +45,14 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
         product_images = request.data.getlist('images')
+        product_cover = request.data.get('cover')
         body = json.loads(request.data['body'])
 
         vendor = request.user
         features = body.pop('features')
 
         # TODO: Wrap try and Catch
-        product = Product.objects.create(vendor=vendor, **body)
+        product = Product.objects.create(vendor=vendor, cover=product_cover, **body)
 
         images_obj = []
         features_obj = []
@@ -173,22 +174,29 @@ class ProductAvailability(APIView):
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
         try:
-            stock = Stock.objects.annotate(
-                                            total_options=Count('options'),
-                                            matching_options=Count('options', filter=Q(options__in=options))
-                                        ).filter(
-                                            product__id=id,
-                                            matching_options=options_len,
-                                            total_options=options_len
-                                        ).first()
+            if options:
+                stock = Stock.objects.annotate(
+                                                total_options=Count('options'),
+                                                matching_options=Count('options', filter=Q(options__in=options))
+                                            ).filter(
+                                                product__id=id,
+                                                matching_options=options_len,
+                                                total_options=options_len
+                                            ).first()
+            else:
+                stock = Stock.objects.filter(product__id=id, options=None).first()
+
             if not stock:
                 return Response(general_utils.error('product_not_available'), status=status.HTTP_404_NOT_FOUND)
 
             if not stock.quantity or stock.quantity < quantity:
                 return Response(general_utils.error('out_of_stock'), status=status.HTTP_404_NOT_FOUND)
 
-            features_additional_price = FeatureOption.objects.filter(id__in=options).aggregate(sum=Sum(F('additional_price')))['sum']
-            new_price = (features_additional_price + product.price.amount)* quantity
+            if options:
+                features_additional_price = FeatureOption.objects.filter(id__in=options).aggregate(sum=Sum(F('additional_price')))['sum']
+                new_price = (features_additional_price + product.price.amount) * quantity
+            else:
+                new_price = product.price.amount * quantity
 
             response = general_utils.success('product_available', new_price=new_price, stock_id=stock.id)
 

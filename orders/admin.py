@@ -57,7 +57,7 @@ class OrderItemConfig(admin.ModelAdmin):
     model = OrderItem
 
     list_display = ('product', 'order', 'stock', 'quantity')
-    fields = ('product', 'order', 'stock', 'quantity')
+    fields = ('product', 'order', 'stock', 'price', 'discount', 'quantity')
 
     search_fields = ('product__name', 'product__description')
 

@@ -8,7 +8,7 @@ from rest_framework.authtoken import views as auth_views
 from rest_framework.compat import coreapi, coreschema
 from rest_framework.schemas import ManualSchema
 from django.http import JsonResponse
-from .serializers import AuthTokenSerializer, SignUpSerializer, UserSerializer, AddressSerilaizer, AddressCreateSerilaizer
+from .serializers import AuthTokenSerializer, SignUpSerializer, UserSerializer, AddressSerilaizer, AddressCreateSerilaizer, TokenObtainPairCustomSerializer
 from django.core.exceptions import ValidationError
 from .serializers import ChangePasswordSerializer
 from users.models import User
@@ -192,6 +192,15 @@ class ResetPasswordConfirmView(ResetPasswordConfirm):
 
         success = general_utils.success('password_reset_successfully')
         return Response(success)
+
+from rest_framework_simplejwt.views import TokenObtainPairView
+
+class TokenObtainPairCustomView(TokenObtainPairView):
+    """
+    Takes a set of user credentials and returns an access and refresh JSON web
+    token pair to prove the authentication of those credentials.
+    """
+    serializer_class = TokenObtainPairCustomSerializer
 
 
 class FavoriteListAddView(APIView):
