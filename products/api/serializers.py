@@ -60,7 +60,7 @@ class SingleProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'rating', 'quantity', 'features', 'category', 'brand', 'images', 'vendor', 'creation', 'relevant_products')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'rating', 'quantity', 'features', 'category', 'brand', 'images', 'cover', 'vendor', 'creation', 'relevant_products')
 
 
     def get_relevant_products(self, product):
@@ -76,7 +76,7 @@ class SingleProductSerializer(serializers.ModelSerializer):
 class VendorProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'cover')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'cover')
 
 class VendorProductSerializer(serializers.ModelSerializer):
     features = FeatureSerializer(many=True, read_only=True)
