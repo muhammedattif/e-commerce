@@ -33,7 +33,7 @@ class ProductsSerializer(serializers.ModelSerializer):
     discount_percentage = serializers.SerializerMethodField('get_discount_percentage')
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'cover', 'price', 'discount', 'discount_percentage', 'rating', 'creation')
+        fields = ('id', 'name', 'description', 'cover', 'minimum_cart_quantity', 'price', 'discount', 'discount_percentage', 'rating', 'creation')
 
     def get_discount_percentage(self, product):
         return (product.discount/product.price)*100
@@ -42,7 +42,7 @@ class CartProductSerializer(serializers.ModelSerializer):
     discount_percentage = serializers.SerializerMethodField('get_discount_percentage')
     class Meta:
         model = Product
-        fields = ('id', 'name', 'price', 'cover', 'discount', 'discount_percentage')
+        fields = ('id', 'name', 'price', 'cover', 'minimum_cart_quantity', 'discount', 'discount_percentage')
 
     def get_discount_percentage(self, product):
         return (product.discount/product.price)*100
@@ -60,7 +60,7 @@ class SingleProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'rating', 'quantity', 'features', 'category', 'brand', 'images', 'cover', 'vendor', 'creation', 'relevant_products')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'discount_percentage', 'rating', 'quantity', 'features', 'category', 'brand', 'images', 'cover', 'minimum_cart_quantity', 'vendor', 'creation', 'relevant_products')
 
 
     def get_relevant_products(self, product):
@@ -76,7 +76,7 @@ class SingleProductSerializer(serializers.ModelSerializer):
 class VendorProductsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'cover')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'cover', 'minimum_cart_quantity')
 
 class VendorProductSerializer(serializers.ModelSerializer):
     features = FeatureSerializer(many=True, read_only=True)
@@ -86,7 +86,7 @@ class VendorProductSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'price', 'discount', 'features', 'category', 'brand', 'images', 'cover')
+        fields = ('id', 'name', 'description', 'price', 'discount', 'features', 'category', 'brand', 'images', 'cover', 'minimum_cart_quantity')
 
 class VendorReviewsSerializer(serializers.ModelSerializer):
     user = UserBasicInfoSerializer(many=False, read_only=True)
