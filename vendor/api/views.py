@@ -113,19 +113,23 @@ class StockCreateListRetriveAPIView(APIView):
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
-        # Check if attribues belongs to this product
-        product_options = FeatureOption.objects.filter(feature__product=product).values_list('id', flat=True)
         if options:
+            # Check if options belongs to this product
+            product_options = FeatureOption.objects.filter(feature__product=product).values_list('id', flat=True)
             match = set(options).issubset(product_options)
             if not match:
                 return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
-
+        else:
+            exists = Stock.objects.filter(product=product, options=None)
+            if exists:
+                error = general_utils.error('stock_already_exists')
+                return Response(error, status=status.HTTP_409_CONFLICT)
         try:
             stock = Stock.objects.create(product=product, quantity=quantity)
             stock.options.set(options)
         except IntegrityError as e:
             error = general_utils.error('stock_already_exists', error_description=str(e))
-            return Response(error)
+            return Response(error, status=status.HTTP_409_CONFLICT)
 
         serializer = StockSerializer(stock, many=False)
         return Response(serializer.data)
