@@ -8,11 +8,15 @@ from orders.api.serializers import VendorOrderItemSerializer
 from orders.models import Order, OrderItem
 from products import utils as product_utils
 import src.utils as general_utils
-from .serializers import StockSerializer, StockItemSerializer, ReportSerializer
+from .serializers import StockSerializer, StockItemSerializer, ReportSerializer, VendorSerlializer, VendorProductUpdateSerializer
 from vendor.models import Stock
 from django.db.models import Sum, F, Count, Q
 from django.db.utils import IntegrityError
 from django.db import transaction
+from django.contrib.auth import get_user_model
+from djmoney.models.fields import MoneyField
+
+User = get_user_model()
 
 class VendorProductList(ListAPIView):
     serializer_class = VendorProductsSerializer
@@ -21,6 +25,13 @@ class VendorProductList(ListAPIView):
         queryset = Product.objects.filter(vendor=self.request.user)
         return queryset
 
+class VendorsList(ListAPIView):
+    serializer_class = VendorSerlializer
+    permission_classes = []
+
+    def get_queryset(self):
+        queryset = User.objects.filter(is_vendor=True)
+        return queryset
 
 class VendorProductDetail(APIView):
     def get(self, request, id):
@@ -35,6 +46,26 @@ class VendorProductDetail(APIView):
 
         serializer = VendorProductSerializer(product, many=False)
         return Response(serializer.data)
+
+    def put(self, request, id):
+
+        try:
+            product = Product.objects.get(id=id, vendor=self.request.user)
+        except Product.DoesNotExist:
+            error = general_utils.error('product_not_found')
+            return Response(error, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = VendorProductUpdateSerializer(product, data=request.data, many=False, context = {
+          'request': request
+        })
+
+        if not serializer.is_valid(raise_exception=True):
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+        serializer.save()
+
+        return Response(serializer.data)
+
 
 class VendorProductReviewsList(ListAPIView):
     serializer_class = VendorReviewsSerializer

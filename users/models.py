@@ -59,7 +59,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30, verbose_name = _('First Name'))
     last_name = models.CharField(max_length=30, verbose_name = _('Last Name'))
     username = models.CharField(max_length=30, unique=True, validators=[UnicodeUsernameValidator()], verbose_name = _('Username'))
-    avatar = models.ImageField(upload_to=get_image_filename, null=True, blank=True, verbose_name = _('Avatar'))
+    avatar = models.ImageField(upload_to=get_image_filename, verbose_name = _('Avatar'))
     location = models.CharField(max_length=100, verbose_name = _('Location'))
     date_joined = models.DateTimeField(auto_now_add=True, verbose_name = _('Date Joined'))
     last_login = models.DateTimeField(auto_now=True, verbose_name = _('Last Login'))
@@ -70,7 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = MyAccountManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'avatar', 'location']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'location', 'avatar']
 
     class Meta(AbstractBaseUser.Meta, PermissionsMixin.Meta):
         verbose_name = _('User')

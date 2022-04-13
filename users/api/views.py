@@ -80,14 +80,6 @@ class Profile(APIView):
         })
         return Response(serializer.data)
 
-class Profile(APIView):
-
-    def get(self, request):
-        serializer = UserSerializer(request.user, many=False, context = {
-          'request': request
-        })
-        return Response(serializer.data)
-
     def put(self, request):
         serializer = UserSerializer(request.user, data=request.data, context={'request': request})
 

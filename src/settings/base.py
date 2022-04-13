@@ -152,6 +152,7 @@ DJOSER = {
     'LOGOUT_ON_PASSWORD_CHANGE': True,
     'PASSWORD_RESET_SHOW_EMAIL_NOT_FOUND': True,
     'SERIALIZERS': {
+        "user_create": "djoserc.serializers.UserCreateSerializer",
     },
     'EMAIL': {
         'password_reset': 'users.email.PasswordResetEmail',

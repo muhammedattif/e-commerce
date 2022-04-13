@@ -4,6 +4,24 @@ from products.api.serializers import FeatureOptionSerializer
 from django.db.models import Sum, F
 from products.api.serializers import ProductsSerializer
 from products.models import Product
+from django.contrib.auth import get_user_model
+from djmoney.contrib.django_rest_framework import MoneyField
+
+User = get_user_model()
+
+class VendorProductUpdateSerializer(serializers.ModelSerializer):
+    price = MoneyField(max_digits=10, decimal_places=2)
+    discount = MoneyField(max_digits=10, decimal_places=2)
+
+    class Meta:
+        model = Product
+        fields = ('id','name', 'description', 'price', 'discount', 'minimum_cart_quantity', 'cover')
+
+
+class VendorSerlializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'avatar', 'location')
 
 class StockSerializer(serializers.ModelSerializer):
     options = FeatureOptionSerializer(many=True, read_only=True)
