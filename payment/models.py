@@ -6,7 +6,8 @@ from django.conf import settings
 from products.models import Product
 from vendor.models import Stock
 from users.models import Address
-from django.db.models import Sum, F
+from django.db.models.functions import Coalesce
+from django.db.models import Sum, F, FloatField
 from decimal import Decimal
 from django.utils.translation import gettext_lazy as _
 
@@ -29,13 +30,13 @@ class Cart(models.Model):
         return f'{self.user.username}'
 
     def calculate_sub_total(self):
-        sub_total = self.items.aggregate(sum=Sum(F('product__price') * F('quantity')))['sum']
-        additional_price = self.items.aggregate(sum=Sum(F('stock__options__additional_price') * F('quantity')))['sum']
+        sub_total = self.items.aggregate( sum=Coalesce(Sum(F('product__price') * F('quantity')), 0, output_field=FloatField()) )['sum']
+        additional_price = self.items.aggregate(sum=Coalesce(Sum(F('stock__options__additional_price') * F('quantity')), 0, output_field=FloatField()))['sum']
         self.sub_total = sub_total + additional_price
         return self.sub_total
 
     def calculate_discount(self):
-        self.discount = self.items.aggregate(sum=Sum( F('product__discount') * F('quantity') ))['sum']
+        self.discount = self.items.aggregate(sum=Coalesce(Sum( F('product__discount') * F('quantity') ), 0, output_field=FloatField()) )['sum']
         return self.discount
 
     def calculate_total(self):
