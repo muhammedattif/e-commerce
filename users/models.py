@@ -13,7 +13,7 @@ def get_image_filename(instance, filename):
 # this class is for overriding default users manager of django user model
 class MyAccountManager(BaseUserManager):
 
-    def create_user(self, email, username, first_name, last_name, avatar, location, password=None, is_staff=False, is_superuser=False, is_vendor=False):
+    def create_user(self, email, username, first_name, last_name, avatar='', location='', password=None, is_staff=False, is_superuser=False, is_vendor=False):
         if not email:
             raise ValueError('User must have an email address')
         if not username:
@@ -37,7 +37,7 @@ class MyAccountManager(BaseUserManager):
         return user
 
     @transaction.atomic
-    def create_superuser(self, email, username, password, first_name, last_name, avatar, location):
+    def create_superuser(self, email, username, password, first_name, last_name, avatar=None, location=None):
         user = self.create_user(
             email=self.normalize_email(email),
             password=password,
@@ -59,8 +59,8 @@ class User(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=30, verbose_name = _('First Name'))
     last_name = models.CharField(max_length=30, verbose_name = _('Last Name'))
     username = models.CharField(max_length=30, unique=True, validators=[UnicodeUsernameValidator()], verbose_name = _('Username'))
-    avatar = models.ImageField(upload_to=get_image_filename, verbose_name = _('Avatar'))
-    location = models.CharField(max_length=100, verbose_name = _('Location'))
+    avatar = models.ImageField(upload_to=get_image_filename, verbose_name = _('Avatar'), blank=True)
+    location = models.CharField(max_length=100, verbose_name = _('Location'), blank=True)
     date_joined = models.DateTimeField(auto_now_add=True, verbose_name = _('Date Joined'))
     last_login = models.DateTimeField(auto_now=True, verbose_name = _('Last Login'))
     is_active = models.BooleanField(default=True, verbose_name = _('Active Status'))
@@ -70,7 +70,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     objects = MyAccountManager()
 
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username', 'first_name', 'last_name', 'location', 'avatar']
+    REQUIRED_FIELDS = ['username', 'first_name', 'last_name']
 
     class Meta(AbstractBaseUser.Meta, PermissionsMixin.Meta):
         verbose_name = _('User')
