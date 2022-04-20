@@ -11,7 +11,7 @@ class OrdersListCreateView(ListAPIView):
     queryset = Order.objects.all()
 
     def get_queryset(self):
-        queryset = super(OrdersListView, self).get_queryset()
+        queryset = super(OrdersListCreateView, self).get_queryset()
         queryset = Order.objects.filter(user=self.request.user)
         return queryset
 
