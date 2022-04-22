@@ -143,10 +143,10 @@ class CheckReview(APIView):
 
     def get(self, request, id):
         response = {}
-        try:
-            Review.objects.filter(user=request.user, product_id=id).first()
+        review = Review.objects.filter(user=request.user, product_id=id).first()
+        if review:
             response['reviewd'] = True
-        except Review.DoesNotExist:
+        else:
             response['reviewd'] = False
 
         return Response(response)
