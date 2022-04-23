@@ -31,12 +31,16 @@ class ProductImageSerializer(serializers.ModelSerializer):
 class ProductsSerializer(serializers.ModelSerializer):
     rating = serializers.FloatField(source='get_rating')
     discount_percentage = serializers.SerializerMethodField('get_discount_percentage')
+    quantity = serializers.SerializerMethodField('get_quantity')
     class Meta:
         model = Product
-        fields = ('id', 'name', 'description', 'cover', 'minimum_cart_quantity', 'price', 'discount', 'discount_percentage', 'rating', 'creation')
+        fields = ('id', 'name', 'description', 'cover', 'quantity', 'minimum_cart_quantity', 'price', 'discount', 'discount_percentage', 'rating', 'creation')
 
     def get_discount_percentage(self, product):
         return (product.discount/product.price)*100
+
+    def get_quantity(self, product):
+        return product.quantity
 
 class CartProductSerializer(serializers.ModelSerializer):
     discount_percentage = serializers.SerializerMethodField('get_discount_percentage')

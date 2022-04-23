@@ -11,7 +11,8 @@ from .serializers import *
 from src.custom_permissions import IsGetOrIsAuthenticated
 import json
 from rest_framework.generics import ListAPIView
-from django.db.models import Q, Count, Sum, F, Value, FloatField
+from django.db.models import Q, Count, Sum, F, Value, FloatField, IntegerField
+from django.db.models.functions import Coalesce
 from functools import reduce
 import operator
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
@@ -22,7 +23,10 @@ class OffersListView(APIView, PageNumberPagination):
     permission_classes = []
 
     def get(self, request):
-        products = Product.objects.prefetch_related('reviews').annotate(discount_percentage=( F('discount')/F('price') )*100  ).order_by('-discount_percentage')[0:10]
+        products = Product.objects.prefetch_related('reviews').annotate(
+        discount_percentage=( F('discount')/F('price') )*100 ,
+        quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
+        ).order_by('-discount_percentage')[0:10]
         products = self.paginate_queryset(products, request, view=self)
         serializer = ProductsSerializer(products, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
@@ -31,8 +35,12 @@ class BestSellerListView(APIView, PageNumberPagination):
     permission_classes = []
 
     def get(self, request):
-        best_seller_items_ids = OrderItem.objects.values('product').annotate(Sum('quantity')).order_by().values_list('product', flat=True)
-        best_seller_items = Product.objects.prefetch_related('reviews').filter(id__in=best_seller_items_ids)[0:10]
+        best_seller_items_ids = OrderItem.objects.values('product').annotate(
+        Sum('quantity'),
+        ).order_by().values_list('product', flat=True)
+        best_seller_items = Product.objects.prefetch_related('reviews').annotate(
+        quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
+        ).filter(id__in=best_seller_items_ids)[0:10]
 
         best_seller_items = self.paginate_queryset(best_seller_items, request, view=self)
         serializer = ProductsSerializer(best_seller_items, many=True, context={'request': request})
@@ -53,7 +61,9 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
     permission_classes=(IsGetOrIsAuthenticated,)
 
     def get(self, request, format=None):
-        products = Product.objects.prefetch_related('reviews').all()
+        products = Product.objects.prefetch_related('reviews').annotate(
+        quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
+        )
         products = self.paginate_queryset(products, request, view=self)
         serializer = ProductsSerializer(products, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
