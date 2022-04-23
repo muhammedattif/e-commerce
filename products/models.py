@@ -88,6 +88,9 @@ class Product(models.Model):
     def get_relevant_products(self):
         return self.category.products.all()[:5]
 
+    def discount_percentage(self):
+        return (self.discount/self.price)*100
+
 class Feature(models.Model):
     product = models.ForeignKey(Product, verbose_name = _('Product'), on_delete=models.CASCADE, related_name='features')
     name = models.CharField(max_length=100, verbose_name = _('Name'))
