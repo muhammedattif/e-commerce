@@ -48,7 +48,9 @@ class BestSellerListView(APIView, PageNumberPagination):
 
 class ProductFilter(ListAPIView):
     permission_classes = ()
-    queryset = Product.objects.select_related('category', 'brand', 'vendor').prefetch_related('features__options', 'category__childs', 'images', 'reviews').all()
+    queryset = Product.objects.select_related('category', 'brand', 'vendor').prefetch_related('features__options', 'category__childs', 'images', 'reviews').annotate(
+    quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
+    )
     serializer_class = ProductsSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name', 'description']
@@ -117,7 +119,9 @@ class ProductDetail(APIView):
             'category', 'vendor'
             ).prefetch_related(
             'features__options', 'images', 'reviews', 'category__products__reviews'
-            ).annotate(quantity=Sum(F('stock__quantity'))).get(id=id)
+            ).annotate(
+            quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
+            ).get(id=id)
         except Product.DoesNotExist:
             error = general_utils.error('product_not_found')
             return Response(error, status=status.HTTP_404_NOT_FOUND)
