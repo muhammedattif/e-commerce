@@ -39,7 +39,13 @@ class BaseListCreateCartItemView(APIView):
             error = general_utils.error('invalid_params')
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
-        if data['quantity'] > stock.quantity:
+        product_in_cart = request.user.cart.items.filter(product__id=data['product'], stock__id=data['stock']).first()
+        if product_in_cart:
+            quantity_in_cart = product_in_cart.quantity
+        else:
+            quantity_in_cart = 0
+
+        if (data['quantity'] + quantity_in_cart) > stock.quantity:
             error = general_utils.error('product_not_available')
             return Response(error, status=status.HTTP_400_BAD_REQUEST)
 
