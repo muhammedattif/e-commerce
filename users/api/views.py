@@ -21,6 +21,8 @@ from django_rest_passwordreset.signals import pre_password_reset, post_password_
 from django.contrib.auth.password_validation import validate_password, get_password_validators
 from django.conf import settings
 import products.utils as product_utils
+from rest_framework.pagination import PageNumberPagination
+
 
 class SignIn(APIView):
     throttle_classes = ()
@@ -195,12 +197,15 @@ class TokenObtainPairCustomView(TokenObtainPairView):
     serializer_class = TokenObtainPairCustomSerializer
 
 
-class FavoriteListAddView(APIView):
+class FavoriteListAddView(APIView, PageNumberPagination):
 
     def get(self, request):
-        favorites = request.user.favorite.products.all()
+
+        favorite, created = Favorite.objects.get_or_create(user=request.user)
+        favorites = favorite.products.all()
+        favorites = self.paginate_queryset(favorites, request, view=self)
         serializer = ProductsSerializer(favorites, many=True)
-        return Response(serializer.data)
+        return self.get_paginated_response(serializer.data)
 
     def post(self, request):
 
@@ -213,8 +218,9 @@ class FavoriteListAddView(APIView):
         if not found:
             return Response(error, status=status.HTTP_404_NOT_FOUND)
 
-        favorites = request.user.favorite.products
-        favorites.add(product)
+        favorite, created = Favorite.objects.get_or_create(user=request.user)
+
+        favorite.products.add(product)
 
         success = general_utils.success('updated_successfully')
         return Response(success)

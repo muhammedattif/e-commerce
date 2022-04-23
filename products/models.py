@@ -154,7 +154,7 @@ class Review(models.Model):
 
 class Favorite(models.Model):
     user = models.OneToOneField(User, verbose_name = _('User'), on_delete=models.CASCADE, related_name='favorite')
-    products = models.ManyToManyField(Product, verbose_name = _('Product'))
+    products = models.ManyToManyField(Product, blank=True, verbose_name = _('Product'))
 
     class Meta:
         verbose_name = _('Favorite')
