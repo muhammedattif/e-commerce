@@ -3,8 +3,7 @@ from djmoney.models.validators import MaxMoneyValidator, MinMoneyValidator
 from django.core.validators import MaxValueValidator, MinValueValidator
 from ckeditor_uploader.fields import RichTextUploadingField
 from users.models import User
-from django.db.models import JSONField, Q, Count, Sum, F, IntegerField
-from django.db.models.functions import Coalesce
+from django.db.models import JSONField, Q, Count, Sum, F
 from categories.models import Category, Brand
 from djmoney.models.fields import MoneyField
 from django.db.models.signals import m2m_changed
@@ -87,9 +86,7 @@ class Product(models.Model):
         return quantity
 
     def get_relevant_products(self):
-        return self.category.products.annotate(
-        quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
-        )[:5]
+        return self.category.products.all()[:5]
 
     def discount_percentage(self):
         return (self.discount/self.price)*100

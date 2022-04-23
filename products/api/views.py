@@ -11,8 +11,7 @@ from .serializers import *
 from src.custom_permissions import IsGetOrIsAuthenticated
 import json
 from rest_framework.generics import ListAPIView
-from django.db.models import Q, Count, Sum, F, Value, FloatField, IntegerField
-from django.db.models.functions import Coalesce
+from django.db.models import Q, Count, Sum, F, Value, FloatField
 from functools import reduce
 import operator
 from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
@@ -23,10 +22,7 @@ class OffersListView(APIView, PageNumberPagination):
     permission_classes = []
 
     def get(self, request):
-        products = Product.objects.prefetch_related('reviews').annotate(
-        discount_percentage=( F('discount')/F('price') )*100 ,
-        quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
-        ).order_by('-discount_percentage')[0:10]
+        products = Product.objects.prefetch_related('reviews').annotate(discount_percentage=( F('discount')/F('price') )*100  ).order_by('-discount_percentage')[0:10]
         products = self.paginate_queryset(products, request, view=self)
         serializer = ProductsSerializer(products, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
@@ -35,12 +31,8 @@ class BestSellerListView(APIView, PageNumberPagination):
     permission_classes = []
 
     def get(self, request):
-        best_seller_items_ids = OrderItem.objects.values('product').annotate(
-        Sum('quantity'),
-        ).order_by().values_list('product', flat=True)
-        best_seller_items = Product.objects.prefetch_related('reviews').annotate(
-        quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
-        ).filter(id__in=best_seller_items_ids)[0:10]
+        best_seller_items_ids = OrderItem.objects.values('product').annotate(Sum('quantity')).order_by().values_list('product', flat=True)
+        best_seller_items = Product.objects.prefetch_related('reviews').filter(id__in=best_seller_items_ids)[0:10]
 
         best_seller_items = self.paginate_queryset(best_seller_items, request, view=self)
         serializer = ProductsSerializer(best_seller_items, many=True, context={'request': request})
@@ -48,9 +40,7 @@ class BestSellerListView(APIView, PageNumberPagination):
 
 class ProductFilter(ListAPIView):
     permission_classes = ()
-    queryset = Product.objects.select_related('category', 'brand', 'vendor').prefetch_related('features__options', 'category__childs', 'images', 'reviews').annotate(
-    quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
-    )
+    queryset = Product.objects.select_related('category', 'brand', 'vendor').prefetch_related('features__options', 'category__childs', 'images', 'reviews').all()
     serializer_class = ProductsSerializer
     filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
     search_fields = ['name', 'description']
@@ -63,9 +53,7 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
     permission_classes=(IsGetOrIsAuthenticated,)
 
     def get(self, request, format=None):
-        products = Product.objects.prefetch_related('reviews').annotate(
-        quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
-        )
+        products = Product.objects.prefetch_related('reviews').all()
         products = self.paginate_queryset(products, request, view=self)
         serializer = ProductsSerializer(products, many=True, context={'request': request})
         return self.get_paginated_response(serializer.data)
@@ -119,9 +107,7 @@ class ProductDetail(APIView):
             'category', 'vendor'
             ).prefetch_related(
             'features__options', 'images', 'reviews', 'category__products__reviews'
-            ).annotate(
-            quantity=Coalesce( Sum(F('stock__quantity')), 0, output_field=IntegerField() )
-            ).get(id=id)
+            ).annotate(quantity=Sum(F('stock__quantity'))).get(id=id)
         except Product.DoesNotExist:
             error = general_utils.error('product_not_found')
             return Response(error, status=status.HTTP_404_NOT_FOUND)
