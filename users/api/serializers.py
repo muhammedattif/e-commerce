@@ -120,7 +120,7 @@ class AddressSerilaizer(serializers.ModelSerializer):
 class AddressCreateSerilaizer(serializers.ModelSerializer):
     class Meta:
         model = Address
-        fields = ('locality', 'city', 'zipcode', 'state')
+        fields = ('locality', 'city', 'zipcode', 'state', 'phone_number')
 
     def create(self, validated_data):
         user = self.context.get('request', None).user

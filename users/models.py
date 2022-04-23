@@ -87,6 +87,7 @@ class Address(models.Model):
     city = models.CharField(max_length=50, verbose_name = _('City'))
     zipcode = models.IntegerField(verbose_name = _('Zipcode'))
     state = models.CharField(max_length=50, verbose_name = _('State'))
+    phone_number = models.CharField(max_length=100)
 
     class Meta:
         verbose_name = _('Address')
