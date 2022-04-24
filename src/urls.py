@@ -38,10 +38,7 @@ schema_view = get_schema_view(
 urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
 
-    # Swagger UI
-    re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-    re_path(r'^$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
+
 
     # Users
     path('users/', include('users.urls', 'users')),
@@ -88,6 +85,10 @@ if settings.DEBUG:
     urlpatterns += [
         # This for debugging
         path('__debug__/', include(debug_toolbar.urls)),
+        # Swagger UI
+        re_path(r'^swagger(?P<format>\.json|\.yaml)$', schema_view.without_ui(cache_timeout=0), name='schema-json'),
+        re_path(r'^$', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
+        re_path(r'^redoc/$', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     ]
 
 from django.conf.urls.i18n import i18n_patterns
