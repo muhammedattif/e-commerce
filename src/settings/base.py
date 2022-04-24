@@ -138,7 +138,7 @@ SIMPLE_JWT = {
 }
 
 DJOSER = {
-    'PASSWORD_RESET_CONFIRM_URL': 'password/reset/confirm/{uid}/{token}',
+    'PASSWORD_RESET_CONFIRM_URL': 'confirm-reset-password?uid={uid}&token={token}',
     'USERNAME_RESET_CONFIRM_URL': 'username/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': 'activate?uid={uid}&token={token}',
     'SEND_ACTIVATION_EMAIL': True,
@@ -233,3 +233,7 @@ LANGUAGES = (
 LOCALE_PATHS = [os.path.join(BASE_DIR, 'locale')]
 
 DEFAULT_LANGUAGE = 1
+
+# Fot HTTPS Schema
+USE_X_FORWARDED_HOST = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
