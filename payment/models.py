@@ -27,7 +27,7 @@ class Cart(models.Model):
         verbose_name_plural = _('Carts')
 
     def __str__(self):
-        return f'{self.user.username}'
+        return f'{self.user.email}'
 
     def calculate_sub_total(self):
         sub_total = self.items.aggregate( sum=Coalesce(Sum(F('product__price') * F('quantity')), 0, output_field=FloatField()) )['sum']

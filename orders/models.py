@@ -11,7 +11,7 @@ from django.utils.translation import gettext_lazy as _
 
 class Order(models.Model):
     user = models.ForeignKey(UserModel, verbose_name = _('User'), on_delete=models.RESTRICT, related_name='orders')
-    address =models.ForeignKey(Address, verbose_name = _('Address'), on_delete=models.RESTRICT)
+    address = models.ForeignKey(Address, verbose_name = _('Address'), on_delete=models.RESTRICT)
     total = MoneyField(max_digits=14, decimal_places=4, default_currency='SAR', verbose_name = _('Total'))
     sub_total = MoneyField(max_digits=14, decimal_places=4, default_currency='SAR', verbose_name = _('Sub Total'))
     discount = MoneyField(max_digits=14, decimal_places=4, default=0, default_currency='SAR', verbose_name = _('Discount'))
@@ -31,7 +31,7 @@ class Order(models.Model):
         verbose_name_plural = _('Orders')
 
     def __str__(self):
-          return self.user.username
+          return self.user.email
 
 
     def cancel(self):

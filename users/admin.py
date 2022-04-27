@@ -5,13 +5,13 @@ from users.models import User, Address
 class UserConfig(UserAdmin):
     model = User
 
-    list_filter = ('email', 'username', 'is_active', 'is_staff')
+    list_filter = ('email', 'phone_number', 'is_active', 'is_staff')
     ordering = ('-date_joined',)
-    list_display = ('email', 'username',
+    list_display = ('email', 'phone_number',
                     'is_active', 'is_staff')
 
     fieldsets = (
-        ("User Information", {'fields': ('email', 'username', 'first_name', 'last_name', 'avatar', 'location')}),
+        ("User Information", {'fields': ('email', 'phone_number', 'first_name', 'last_name', 'avatar', 'location')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'is_vendor', 'is_superuser', 'groups', 'user_permissions')}),
     )
 

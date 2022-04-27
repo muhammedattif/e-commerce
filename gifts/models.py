@@ -410,7 +410,7 @@ class Redemption(models.Model):
     redeemed_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.promo_code.code}-{self.user.username}'
+        return f'{self.promo_code.code}-{self.user.email}'
 
     @transaction.atomic
     def delete(self):

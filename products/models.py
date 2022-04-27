@@ -152,7 +152,7 @@ class Review(models.Model):
         verbose_name_plural = _('Reviews')
 
     def __str__(self):
-        return self.user.username
+        return self.user.email
 
 
 class Favorite(models.Model):
@@ -164,4 +164,4 @@ class Favorite(models.Model):
         verbose_name_plural = _('Favorites')
 
     def __str__(self):
-        return self.user.username
+        return self.user.email

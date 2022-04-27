@@ -8,14 +8,22 @@ from django.core.exceptions import ValidationError
 from django.conf import settings
 from django.db import transaction
 from django.contrib.auth import get_user_model
+from djoser.serializers import UserCreatePasswordRetypeSerializer
+from rest_framework.validators import UniqueValidator
+
 User = get_user_model()
+
+
+class UserCreateSerializer(UserCreatePasswordRetypeSerializer):
+    phone_number = serializers.CharField(required=True, validators=[UniqueValidator(queryset=User.objects.all(),
+                                        message=("Phone number already exists"))])
 
 class SignUpSerializer(serializers.ModelSerializer):
 
     re_password = serializers.CharField(style={'input_type': 'password'}, write_only=True)
     class Meta:
         model = User
-        fields = ['email', 'username', 'first_name', 'last_name', 'avatar', 'password', 're_password', 'is_vendor']
+        fields = ['email', 'phone_number', 'first_name', 'last_name', 'avatar', 'password', 're_password', 'is_vendor']
         extra_kwargs = {
             'password': {'write_only': True}
         }
@@ -28,7 +36,7 @@ class SignUpSerializer(serializers.ModelSerializer):
 
         user = User(
             email=self.validated_data['email'],
-            username=self.validated_data['username'],
+            phone_number=self.validated_data['phone_number'],
             first_name=self.validated_data['first_name'],
             last_name=self.validated_data['last_name'],
             avatar=self.validated_data['avatar'],
@@ -104,12 +112,12 @@ def validateEmail( email ):
 class UserBasicInfoSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name')
+        fields = ('id', 'email', 'phone_number', 'first_name', 'last_name')
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'location', 'avatar', 'date_joined', 'last_login')
+        fields = ('id', 'email', 'phone_number', 'first_name', 'last_name', 'location', 'avatar', 'date_joined', 'last_login')
 
 
 class AddressSerilaizer(serializers.ModelSerializer):
