@@ -10,6 +10,9 @@ from django.db import transaction
 from django.contrib.auth import get_user_model
 from djoser.serializers import UserCreatePasswordRetypeSerializer
 from rest_framework.validators import UniqueValidator
+from users.models import Vendor
+from django.db import transaction
+from djoser.conf import settings as djoser_settings
 
 User = get_user_model()
 
@@ -17,6 +20,25 @@ User = get_user_model()
 class UserCreateSerializer(UserCreatePasswordRetypeSerializer):
     phone_number = serializers.CharField(required=True, validators=[UniqueValidator(queryset=User.objects.all(),
                                         message=("Phone number already exists"))])
+
+    class Meta(UserCreatePasswordRetypeSerializer.Meta):
+        fields = ('id', 'email', 'phone_number', 'first_name', 'last_name', 'reg_as_vendor', 'password')
+
+
+
+    def perform_create(self, validated_data):
+        with transaction.atomic():
+            user = User.objects.create_user(**validated_data)
+
+            if user.reg_as_vendor:
+                # Create Vendor
+                Vendor.objects.create(user=user)
+
+            if djoser_settings.SEND_ACTIVATION_EMAIL:
+                user.is_active = False
+                user.save(update_fields=["is_active"])
+        return user
+
 
 class SignUpSerializer(serializers.ModelSerializer):
 
@@ -183,7 +205,7 @@ class TokenObtainPairCustomSerializer(TokenObtainPairSerializer):
 
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
-        data['is_vendor'] = self.user.is_vendor
+        data['is_vendor'] = self.user.is_active_vendor
 
 
         if api_settings.UPDATE_LAST_LOGIN:

@@ -21,7 +21,7 @@ class VendorProductUpdateSerializer(serializers.ModelSerializer):
 class VendorSerlializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ('id', 'email', 'username', 'first_name', 'last_name', 'avatar', 'location')
+        fields = ('id', 'email', 'phone_number', 'first_name', 'last_name', 'avatar', 'location')
 
 class StockSerializer(serializers.ModelSerializer):
     options = FeatureOptionSerializer(many=True, read_only=True)

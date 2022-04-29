@@ -30,7 +30,7 @@ class VendorsList(ListAPIView):
     permission_classes = []
 
     def get_queryset(self):
-        queryset = User.objects.filter(is_vendor=True)
+        queryset = User.objects.filter(vendor_status__is_active=True)
         return queryset
 
 class VendorProductDetail(APIView):
@@ -108,7 +108,7 @@ class StockCreateListRetriveAPIView(APIView):
 
     def put(self, request, id):
 
-        if not request.user.is_vendor:
+        if not request.user.is_active_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
         if not ('stock_id' and 'quantity') in request.data:
@@ -128,7 +128,7 @@ class StockCreateListRetriveAPIView(APIView):
     @transaction.atomic
     def post(self, request, id):
 
-        if not request.user.is_vendor:
+        if not request.user.is_active_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
         if not ('options' and 'quantity') in request.data:
@@ -170,7 +170,7 @@ class ProductStockFeaturesAPIView(APIView):
 
     def get(self, request, id):
 
-        if not request.user.is_vendor:
+        if not request.user.is_active_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
         filter_kwargs = {
@@ -189,7 +189,7 @@ class Report(APIView):
 
     def get(self, request):
 
-        if not request.user.is_vendor:
+        if not request.user.is_active_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
         number_of_orders = Order.objects.select_related('user').filter(items__product__vendor=request.user).count()

@@ -60,7 +60,7 @@ class BaseListCreateProductView(APIView, PageNumberPagination):
 
     @transaction.atomic
     def post(self, request, format=None):
-        if not request.user.is_authenticated or not request.user.is_vendor:
+        if not request.user.is_authenticated or not request.user.is_active_vendor:
             return Response(general_utils.error('not_vendor'), status=status.HTTP_403_FORBIDDEN)
 
         product_images = request.data.getlist('images')

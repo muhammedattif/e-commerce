@@ -13,7 +13,7 @@ def get_image_filename(instance, filename):
 # this class is for overriding default users manager of django user model
 class MyAccountManager(BaseUserManager):
 
-    def create_user(self, email, phone_number, first_name, last_name, avatar='', location='', password=None, is_staff=False, is_superuser=False, is_vendor=False):
+    def create_user(self, email, phone_number, first_name, last_name, avatar='', location='', password=None, is_staff=False, is_superuser=False, reg_as_vendor=False):
         if not email:
             raise ValueError('User must have an email address')
         if not phone_number:
@@ -28,7 +28,7 @@ class MyAccountManager(BaseUserManager):
                         location=location,
                         is_staff=is_staff,
                         is_superuser=is_superuser,
-                        is_vendor=is_vendor
+                        reg_as_vendor=reg_as_vendor
                         )
 
 
@@ -47,7 +47,7 @@ class MyAccountManager(BaseUserManager):
             avatar=avatar,
             location=location,
             is_staff = True,
-            is_vendor = True,
+            reg_as_vendor = False,
             is_superuser = True
         )
         user.save(using = self._db)
@@ -65,7 +65,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     last_login = models.DateTimeField(auto_now=True, verbose_name = _('Last Login'))
     is_active = models.BooleanField(default=True, verbose_name = _('Active Status'))
     is_staff = models.BooleanField(default=False, verbose_name = _('Staff Status'))
-    is_vendor = models.BooleanField(default=False, verbose_name = _('Vendor status'))
+    reg_as_vendor = models.BooleanField(default=False, verbose_name = _('Registered as vendor'))
 
     objects = MyAccountManager()
 
@@ -79,6 +79,17 @@ class User(AbstractBaseUser, PermissionsMixin):
     # resize profile image before saving
     def save(self, created=None, *args, **kwargs):
         super().save(*args, **kwargs)
+
+    @property
+    def is_active_vendor(self):
+        return Vendor.objects.filter(user=self, is_active=True).exists()
+
+class Vendor(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='vendor_status')
+    is_active = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.user.email
 
 
 class Address(models.Model):
