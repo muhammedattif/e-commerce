@@ -8,6 +8,16 @@ from django.db.utils import IntegrityError
 import src.utils as general_utils
 from django.utils.translation import gettext_lazy as _
 
+
+class JoinForm(models.Model):
+    agent_name = models.CharField(_('Agent Name'), max_length=100)
+    vendor_name = models.CharField(_('Vendor Name'), max_length=100)
+    email = models.CharField(_('Email'), max_length=100)
+    phone_number = models.CharField(_('Phone Number'), unique=True, max_length=100)
+
+    def __str__(self):
+        return self.vendor_name
+
 class Stock(models.Model):
     product = models.ForeignKey(Product, verbose_name = _('Product'), on_delete=models.RESTRICT, related_name='stock')
     options = models.ManyToManyField(FeatureOption, blank=True, verbose_name = _('Option'))

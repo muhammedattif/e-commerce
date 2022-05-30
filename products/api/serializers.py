@@ -9,8 +9,13 @@ from django.db import transaction
 
 from users.api.serializers import UserBasicInfoSerializer
 from users.models import User
-from products.models import Product, ProductImage, Review, Feature, FeatureOption
+from products.models import Product, ProductImage, Review, Feature, FeatureOption, OfferBanner
 from categories.api.serializers import BrandSerializer, CategorySerializer
+
+class OfferBannerSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = OfferBanner
+        fields = '__all__'
 
 class FeatureOptionSerializer(serializers.ModelSerializer):
     class Meta:

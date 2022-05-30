@@ -13,7 +13,7 @@ def get_image_filename(instance, filename):
 # this class is for overriding default users manager of django user model
 class MyAccountManager(BaseUserManager):
 
-    def create_user(self, email, phone_number, first_name, last_name, avatar='', location='', password=None, is_staff=False, is_superuser=False, reg_as_vendor=False):
+    def create_user(self, email, phone_number, password, **extra_fields):
         if not email:
             raise ValueError('User must have an email address')
         if not phone_number:
@@ -22,13 +22,7 @@ class MyAccountManager(BaseUserManager):
         user = self.model(
                         email=self.normalize_email(email),
                         phone_number=phone_number,
-                        first_name=first_name,
-                        last_name=last_name,
-                        avatar=avatar,
-                        location=location,
-                        is_staff=is_staff,
-                        is_superuser=is_superuser,
-                        reg_as_vendor=reg_as_vendor
+                        **extra_fields
                         )
 
 
@@ -55,17 +49,21 @@ class MyAccountManager(BaseUserManager):
 
 # Account Model
 class User(AbstractBaseUser, PermissionsMixin):
-    email = models.EmailField(max_length=60, unique=True, verbose_name = _('Email'))
-    first_name = models.CharField(max_length=30, verbose_name = _('First Name'))
-    last_name = models.CharField(max_length=30, verbose_name = _('Last Name'))
     phone_number = models.CharField(unique=True, max_length=100, null=True)
-    avatar = models.ImageField(upload_to=get_image_filename, verbose_name = _('Avatar'), blank=True)
-    location = models.CharField(max_length=100, verbose_name = _('Location'), blank=True)
-    date_joined = models.DateTimeField(auto_now_add=True, verbose_name = _('Date Joined'))
-    last_login = models.DateTimeField(auto_now=True, verbose_name = _('Last Login'))
-    is_active = models.BooleanField(default=True, verbose_name = _('Active Status'))
-    is_staff = models.BooleanField(default=False, verbose_name = _('Staff Status'))
-    reg_as_vendor = models.BooleanField(default=False, verbose_name = _('Registered as vendor'))
+    email = models.EmailField(max_length=60, unique=True, verbose_name=_('Email'))
+    first_name = models.CharField(max_length=30, verbose_name=_('First Name'))
+    last_name = models.CharField(max_length=30, verbose_name=_('Last Name'))
+    agent_name = models.CharField(max_length=30, verbose_name=_('Agent Name'), blank=True)
+    location = models.CharField(max_length=100, verbose_name=_('Location'), blank=True)
+    city = models.CharField(max_length=100, verbose_name=_('City'), blank=True)
+    district = models.CharField(max_length=100, verbose_name=_('District Name'), blank=True)
+    avatar = models.ImageField(upload_to=get_image_filename, verbose_name=_('Avatar'), blank=True)
+
+    date_joined = models.DateTimeField(auto_now_add=True, verbose_name=_('Date Joined'))
+    last_login = models.DateTimeField(auto_now=True, verbose_name=_('Last Login'))
+    is_active = models.BooleanField(default=True, verbose_name=_('Active Status'))
+    is_staff = models.BooleanField(default=False, verbose_name=_('Staff Status'))
+    reg_as_vendor = models.BooleanField(default=False, verbose_name=_('Registered as vendor'))
 
     objects = MyAccountManager()
 

@@ -165,3 +165,11 @@ class Favorite(models.Model):
 
     def __str__(self):
         return self.user.email
+
+class OfferBanner(models.Model):
+    title = models.CharField(blank=True, max_length=100)
+    image = models.ImageField(upload_to="offers-images/")
+    url = models.CharField(blank=True, max_length=100)
+
+    def __str__(self):
+        return self.title if self.title else str(self.id)

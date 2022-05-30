@@ -223,3 +223,10 @@ class ProductAvailability(APIView):
 
         except ValueError:
             return Response(general_utils.error('invalid_params'), status=status.HTTP_400_BAD_REQUEST)
+
+
+class OfferBannerListView(ListAPIView):
+    permission_classes = ()
+    authentication_classes = ()
+    serializer_class = OfferBannerSerializer
+    queryset = OfferBanner.objects.all()

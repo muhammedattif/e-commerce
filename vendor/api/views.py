@@ -1,4 +1,4 @@
-from rest_framework.generics import ListAPIView, ListCreateAPIView
+from rest_framework.generics import ListAPIView, ListCreateAPIView, CreateAPIView
 from rest_framework.views import APIView
 from rest_framework import status
 from rest_framework.response import Response
@@ -8,8 +8,15 @@ from orders.api.serializers import VendorOrderItemSerializer
 from orders.models import Order, OrderItem
 from products import utils as product_utils
 import src.utils as general_utils
-from .serializers import StockSerializer, StockItemSerializer, ReportSerializer, VendorSerlializer, VendorProductUpdateSerializer
-from vendor.models import Stock
+from .serializers import (
+StockSerializer,
+StockItemSerializer,
+ReportSerializer,
+VendorSerlializer,
+VendorProductUpdateSerializer,
+JoinFormSerializer
+)
+from vendor.models import Stock, JoinForm
 from django.db.models import Sum, F, Count, Q
 from django.db.utils import IntegrityError
 from django.db import transaction
@@ -222,3 +229,10 @@ class Report(APIView):
 
         serializer = ReportSerializer(data, many=False)
         return Response(serializer.data)
+
+
+class JoinRequest(CreateAPIView):
+    authentication_classes = []
+    permission_classes = []
+    serializer_class = JoinFormSerializer
+    queryset = JoinForm.objects.all()

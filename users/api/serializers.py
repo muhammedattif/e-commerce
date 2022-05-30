@@ -1,8 +1,9 @@
+import importlib
 from django.contrib.auth import authenticate
 from users.models import User, Address
 from django.shortcuts import get_object_or_404
 from django.utils.translation import gettext_lazy as _
-from rest_framework import serializers
+from rest_framework import serializers, exceptions
 from django.core.validators import validate_email
 from django.core.exceptions import ValidationError
 from django.conf import settings
@@ -13,16 +14,19 @@ from rest_framework.validators import UniqueValidator
 from users.models import Vendor
 from django.db import transaction
 from djoser.conf import settings as djoser_settings
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework_simplejwt.settings import api_settings
 
 User = get_user_model()
-
+rule_package, user_eligible_for_login = api_settings.USER_AUTHENTICATION_RULE.rsplit('.', 1)
+login_rule = importlib.import_module(rule_package)
 
 class UserCreateSerializer(UserCreatePasswordRetypeSerializer):
     phone_number = serializers.CharField(required=True, validators=[UniqueValidator(queryset=User.objects.all(),
                                         message=("Phone number already exists"))])
 
     class Meta(UserCreatePasswordRetypeSerializer.Meta):
-        fields = ('id', 'email', 'phone_number', 'first_name', 'last_name', 'reg_as_vendor', 'password')
+        fields = ('id', 'email', 'phone_number', 'first_name', 'last_name', 'agent_name', 'city', 'district', 'reg_as_vendor', 'password')
 
 
 
@@ -193,16 +197,39 @@ class ChangePasswordSerializer(serializers.Serializer):
         return super(RegisterUserSerializer, self).validate(data)
 
 
-
-from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
-from rest_framework_simplejwt.settings import api_settings
-
 class TokenObtainPairCustomSerializer(TokenObtainPairSerializer):
     def validate(self, attrs):
-        data = super().validate(attrs)
+        email =  attrs['email']
+        password = attrs['password']
+
+        try:
+            request = self.context['request']
+        except KeyError:
+            pass
+
+        # Check if user sent email
+        if not validateEmail(email):
+            try:
+                user_request = User.objects.get(phone_number=email)
+            except User.DoesNotExist:
+                msg = 'Unable to log in with provided credentials.'
+                raise exceptions.AuthenticationFailed(
+                    msg
+                )
+
+            email = user_request.email
+
+        self.user = authenticate(request=request, email=email, password=password)
+
+        if not getattr(login_rule, user_eligible_for_login)(self.user):
+            raise exceptions.AuthenticationFailed(
+                self.error_messages['no_active_account'],
+                'no_active_account',
+            )
+
 
         refresh = self.get_token(self.user)
-
+        data = {}
         data['refresh'] = str(refresh)
         data['access'] = str(refresh.access_token)
         data['is_vendor'] = self.user.is_active_vendor
