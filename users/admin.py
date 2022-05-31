@@ -11,7 +11,7 @@ class UserConfig(UserAdmin):
                     'is_active', 'is_staff')
 
     fieldsets = (
-        ("User Information", {'fields': ('email', 'phone_number', 'first_name', 'last_name', 'avatar', 'location')}),
+        ("User Information", {'fields': ('email', 'phone_number', 'first_name', 'last_name', 'agent_name', 'city', 'district', 'location', 'avatar')}),
         ('Permissions', {'fields': ('is_staff', 'is_active', 'reg_as_vendor', 'is_superuser', 'groups', 'user_permissions')}),
     )
 
