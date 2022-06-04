@@ -10,21 +10,28 @@ from djmoney.contrib.django_rest_framework import MoneyField
 User = get_user_model()
 
 class VendorProductUpdateSerializer(serializers.ModelSerializer):
-    price = MoneyField(max_digits=10, decimal_places=2, default_currency='SAR')
-    discount = MoneyField(max_digits=10, decimal_places=2, default_currency='SAR')
+    price = MoneyField(max_digits=10, decimal_places=2, default_currency='SAR', required=False)
+    discount = MoneyField(max_digits=10, decimal_places=2, default_currency='SAR', required=False)
 
     class Meta:
         model = Product
         fields = ('id','name', 'description', 'price', 'discount', 'minimum_cart_quantity', 'cover')
+        extra_kwargs = {
+        "name": {"required": False},
+        "description": {"required": False},
+        "minimum_cart_quantity": {"required": False},
+        "cover": {"required": False},
+        }
 
     def validate_price(self, price):
         if price.amount < 1:
             raise serializers.ValidationError(f'Price must not be less than 1 {price.currency}')
+        return price
 
     def validate_discount(self, discount):
         if discount.amount < 0:
             raise serializers.ValidationError(f'Discount must not be less than 1 {discount.currency}')
-
+        return discount
 
 class VendorSerlializer(serializers.ModelSerializer):
     class Meta:
