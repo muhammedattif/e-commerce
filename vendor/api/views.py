@@ -22,11 +22,18 @@ from django.db.utils import IntegrityError
 from django.db import transaction
 from django.contrib.auth import get_user_model
 from djmoney.models.fields import MoneyField
+from django_filters.rest_framework import DjangoFilterBackend, OrderingFilter
+from rest_framework import filters
 
 User = get_user_model()
 
 class VendorProductList(ListAPIView):
     serializer_class = VendorProductsSerializer
+
+    filter_backends = [DjangoFilterBackend, filters.OrderingFilter, filters.SearchFilter]
+    search_fields = ['name', 'description']
+    filterset_fields = ['category__name', 'brand__name', 'price']
+    ordering_fields = ['price', 'creation']
 
     def get_queryset(self):
         queryset = Product.objects.filter(vendor=self.request.user)

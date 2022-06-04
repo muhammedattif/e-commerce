@@ -12,6 +12,7 @@ from django.db.utils import IntegrityError
 from django.contrib.auth import get_user_model
 from django.utils.translation import gettext_lazy as _
 import src.utils as general_utils
+from django.core.exceptions import ValidationError
 
 User = get_user_model()
 
@@ -49,9 +50,18 @@ class Product(models.Model):
         return self.name
 
     def save(self, *args, **kwargs):
+        self.full_clean()
         if not self.code:
             self.code = generate_random_string()
         super(Product, self).save(*args, **kwargs)
+
+    def clean(self):
+        super(Product, self).clean()
+        if self.price.amount < 1:
+            raise ValidationError(f'Price must not be less than 1 {self.price.currency}')
+
+        if self.discount.amount < 0:
+            raise ValidationError(f'Discount must not be less than 1 {self.discount.currency}')
 
     def get_rating(self):
         total_reviews = self.reviews.count()
